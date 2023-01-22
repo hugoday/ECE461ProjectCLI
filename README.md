@@ -2,4 +2,4 @@
 Hugo Day
 Luke Diehm
 B.J. Pemberton
-Aubrey Gatewood
+Aubrey M. Gatewood
