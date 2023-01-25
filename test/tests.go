@@ -5,13 +5,19 @@ import (
 	"os/exec"
 )
 
-func main() {
-
-	cmd := exec.Command("python", "-c", "import sys; sys.path.append('../'); from src import test; print(test.foo(1,2))")
-	fmt.Println(cmd.Args)
+func runModule(function string) string {
+	setup := "import sys; sys.path.append('../'); from src import test;"
+	cmd := exec.Command("python", "-c", setup+"print("+function+")")
+	// fmt.Println(cmd.Args)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(out))
+	return string(out)
+}
+
+func main() {
+
+	fmt.Println(runModule("test.foo(2,5)"))
+
 }
