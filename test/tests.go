@@ -6,7 +6,7 @@ import (
 )
 
 func runModule(function string) string {
-	setup := "import sys; sys.path.append('../'); from src import test;"
+	setup := "import sys; sys.path.append('../'); from src.python import test;"
 	cmd := exec.Command("python", "-c", setup+"print("+function+")")
 	// fmt.Println(cmd.Args)
 	out, err := cmd.CombinedOutput()
