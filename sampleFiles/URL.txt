@@ -1,3 +1,2 @@
-https://github.com/pytorch/pytorch
-https://github.com/tensorflow/tensorflow
+https://github.com/hugoday/resume
 not/a/URL
