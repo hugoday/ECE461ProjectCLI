@@ -16,10 +16,6 @@ type URLnode struct {
 	next *URLnode
 }
 
-type URLhead struct {
-	next *URLnode
-}
-
 func runModule(function string) string {
 	setup := "import sys; sys.path.append('../'); from src.python import test;"
 	cmd := exec.Command("python", "-c", setup+"print("+function+")")
@@ -32,10 +28,9 @@ func runModule(function string) string {
 }
 
 func cloneRepo(url string) string {
-	cmd := exec.Command("git", "clone ", url)
-	// fmt.Println(cmd.Args)
-	err := cmd.Run()
-	if err != nil {
+	s := subprocess.New("git clone " + url + " src/repos/rnd")
+	if err := s.Exec(); err != nil {
+		log.Fatal(err)
 		fmt.Println(err)
 		return ("ERROR")
 	}
@@ -43,13 +38,18 @@ func cloneRepo(url string) string {
 }
 
 func traverseList(next URLnode) {
-	for true {
+	for {
 		fmt.Println(next.url)
 		if next.next == nil {
 			break
 		}
 		next = *next.next
 	}
+}
+
+func clearRepoFolder() {
+	s := subprocess.New("rm -Force -r ", subprocess.Arg("src/repos/*"))
+	fmt.Println(s.Exec())
 }
 
 func main() {
@@ -68,20 +68,18 @@ func main() {
 		prev = &new
 	}
 
-	// fmt.Println("Traversing linked list...")
-
 	traverseList(head)
 
-	s := subprocess.New("git clone https://github.com/hugoday/resume")
-
-	if err := s.Exec(); err != nil {
-		log.Fatal(err)
-	}
+	fmt.Println()
+	fmt.Println("Cloning...")
+	clearRepoFolder()
 
 	url := head.next
 	for url != nil {
 		fmt.Println(cloneRepo(url.url))
 		url = url.next
+
+		clearRepoFolder()
 	}
 
 	// fmt.Println("[DONE]")
