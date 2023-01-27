@@ -2,6 +2,12 @@ import sys, getopt, os
 
 #convert into executable
 
+def fileExists(path):
+    if not os.path.isfile(path):
+        print("Please provide a valid file")
+        return False
+    return True
+
 def main(argv):
     arg = sys.argv[1]
     if arg == "install":
@@ -20,7 +26,9 @@ def main(argv):
         return 0
     else:
         #URL file maybe
+        if not fileExists(arg): return 1
         print("URL time")
+        os.system("go run ./src/go/URLs.go " + arg)
         return 0
     return 1
 
