@@ -67,21 +67,24 @@ func main() {
 		prev.next = &new
 		prev = &new
 	}
+		
+	s := subprocess.New("../../../test1.sh")
+	fmt.Println(s.Exec())
 
-	traverseList(head)
+	// traverseList(head)
 
-	fmt.Println()
-	fmt.Println("Cloning...")
-	clearRepoFolder()
+	// fmt.Println()
+	// fmt.Println("Cloning...")
+	// clearRepoFolder()
 
-	url := head.next
-	for url != nil {
-		fmt.Println(cloneRepo(url.url))
-		url = url.next
+	// url := head.next
+	// for url != nil {
+	// 	fmt.Println(cloneRepo(url.url))
+	// 	url = url.next
 
-		clearRepoFolder()
-	}
+	// 	clearRepoFolder()
+	// }
 
-	// fmt.Println("[DONE]")
+	fmt.Println("[DONE]")
 
 }
