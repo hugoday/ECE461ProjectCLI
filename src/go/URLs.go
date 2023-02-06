@@ -3,17 +3,24 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
+
 	"github.com/estebangarcia21/subprocess"
+
 	// "github.com/go-git/go-git/v5"
 	"log"
 	"os"
 	"os/exec"
+
 	// "subprocess"
 	// "fmt"
 	// "log"
 	// "os"
+	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
+	// "time"
 )
 
 // Struct for a repository
@@ -34,7 +41,6 @@ type repo struct {
 func runModule(function string) string {
 	setup := "import sys; sys.path.append('../'); from src.python import test;"
 	cmd := exec.Command("python", "-c", setup+"print("+function+")")
-	// fmt.Println(cmd.Args)
 	out, err := cmd.Output()
 	if err != nil {
 		fmt.Println(err)
@@ -43,20 +49,45 @@ func runModule(function string) string {
 }
 
 func runRestApi(url string) {
-	setup := "import sys; sys.path.append('../'); from src.python import rest_api;"
-	cmd := exec.Command("python", "-c", setup+"rest_api.getIssues("+url+")")
-	// fmt.Println(cmd.Args)
-	out, err := cmd.Output()
+
+	index := strings.Index(url, ".com/")
+	if index == -1 {
+		fmt.Println("No '.com/' found in the string")
+		return
+	}
+	url = url[index+5:]
+
+	token := os.Getenv("GITHUB_TOKEN")
+	code := `import os;
+os.remove('src/python/issues/closed.txt') if os.path.exists('src/python/issues/closed.txt') else "continue";
+os.remove('src/python/issues/open.txt') if os.path.exists('src/python/issues/open.txt') else "continue";
+os.system('curl -i -H "Authorization: token ` + token + `" https://api.github.com/search/issues?q=repo:` + url + `+type:issue+state:closed >> src/python/issues/closed.txt');
+os.system('curl -i -H "Authorization: token ` + token + `" https://api.github.com/search/issues?q=repo:` + url + `+type:issue+state:open >> src/python/issues/open.txt');`
+
+	cmd := exec.Command("python", "-c", code)
+
+	err := cmd.Run()
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(out)
+
+	// setup := "\"import sys; sys.path.append('../'); from src.python import rest_api;"
+	// // cmd := exec.Command("python", "-c", setup+"rest_api.getIssues(\\\""+url+"\\\")\"")
+
+	// s := subprocess.New("python -c " + setup + "rest_api.getIssues(\\\"" + url + "\")\"")
+	// fmt.Println(s)
+	// if err := s.Exec(); err != nil {
+	// 	log.Fatal(err)
+	// 	fmt.Println(err)
+	// 	// eturn r("ERROR")
+	// }
+	// return string("SUCCESS")
+	return
 }
 
 func teardownRestApi() {
 	setup := "import sys; sys.path.append('../'); from src.python import rest_api;"
 	cmd := exec.Command("python", "-c", setup+"rest_api.deleteIssues()")
-	// fmt.Println(cmd.Args)
 	_, err := cmd.Output()
 	if err != nil {
 		fmt.Println(err)
@@ -66,24 +97,24 @@ func teardownRestApi() {
 // Function to get responsiveness metric score
 func getResponsiveness(url string) int {
 
-	return 5
+	return -1
 }
 
 // Function to get correctness metric score
 func getCorrectness(url string) float64 {
+	fmt.Println("Getting correctness...")
 
-	fmt.Println(url)
 	runRestApi(url)
 
 	regex, _ := regexp.Compile("\"total_count\": [0-9]+") //Regex for finding count of issues in input file
 	num_regex, _ := regexp.Compile("[0-9]+")              //Regex for parsing count into only integer
 
 	//closed issues
-	fmt.Println(os.Getwd())
 	data_closed, err1 := os.ReadFile("./src/python/issues/closed.txt")
 	if err1 != nil {
-		fmt.Println("Did not find closed issues file from api")
+		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
 		log.Fatal(err1)
+		return 0
 	}
 	closed_count := regex.FindString(string(data_closed))
 	closed_count = num_regex.FindString(closed_count)
@@ -91,47 +122,110 @@ func getCorrectness(url string) float64 {
 	//open issues
 	data_open, err := os.ReadFile("./src/python/issues/open.txt")
 	if err != nil {
-		fmt.Println("Did not find open issues file from api")
+		fmt.Println("Did not find open issues file from api, invalid url: " + url)
 		log.Fatal(err)
+		return 0
 	}
 	open_count := regex.FindString(string(data_open))
 	open_count = num_regex.FindString(open_count)
+	fmt.Println("Open: " + open_count + "\nClosed: " + closed_count)
 
 	score := calc_score(open_count, closed_count)
+	if math.IsNaN(score) {
+		score = 0
+	}
 	// fmt.Println(score)
 
 	teardownRestApi()
+	fmt.Println("[CORRECTNESS DONE] ", score)
+	fmt.Println()
 	return score
 }
 
 // Function to get ramp-up time metric scor
 func getRampUpTime(url string) int {
 
-	return 3
+	return -1
 
 }
 
 // Function to get bus factor metric score
 func getBusFactor(url string) int {
 
-	return 2
+	return -1
 
 }
 
 // Function to get license compatibility metric score
 func getLicenseCompatibility(url string) int {
+	fmt.Println("Checking for license... ")
 
-	return 1
+	cloneRepo(url)
+	foundLicense := searchForLicenses("./src/repos/rnd/")
+	clearRepoFolder()
+
+	if foundLicense {
+		fmt.Println("[LICENSE FOUND]")
+		return 1
+	}
+	fmt.Println("[LICENSE NOT FOUND]")
+	return 0
+}
+
+func checkFileForLicense(path string) bool {
+	license := "LGPL-2.1"
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Print("Coudln't open path ")
+		fmt.Println(err)
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if idx := strings.Index(line, license); idx != -1 {
+			fmt.Println("Found license in file:", path)
+			return true
+		}
+	}
+	return false
+}
+
+func searchForLicenses(folder string) bool {
+	found := false
+	//walk the repo looking for the license
+	err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
+		if found {
+			return nil
+		}
+		if info.IsDir() { //skip .git, etc
+			if info.Name()[0] == '.' {
+				return filepath.SkipDir
+			}
+		} else {
+			// fmt.Println("Searching for license in: " + path)
+			found = checkFileForLicense(path)
+		}
+		return nil
+	})
+
+	//catch errors
+	if err != nil {
+		fmt.Println(err)
+	}
+	return found
 }
 
 func calc_score(s1 string, s2 string) float64 {
 
 	f1, err := strconv.ParseFloat(s1, 32)
-	fmt.Println(s1)
+	// fmt.Println(s1)
 	if err != nil {
 		fmt.Println("Conversion of s1 to string float didn't work.")
 	}
-	fmt.Println(s2)
+	// fmt.Println(s2)
 	f2, err1 := strconv.ParseFloat(s2, 32)
 	if err1 != nil {
 		fmt.Println("Conversion of s2 to string float didn't work.")
@@ -154,6 +248,18 @@ func newRepo(url string) *repo {
 	return &r
 }
 
+func printRepo(r repo) {
+	fmt.Println("URL: " + r.URL)
+	fmt.Println("busFactor: ", r.busFactor)
+	fmt.Println("correctness: ", r.correctness)
+	fmt.Println("licenseCompatibility: ", r.licenseCompatibility)
+	fmt.Println("rampUpTime: ", r.rampUpTime)
+	fmt.Println("responsiveness: ", r.responsiveness)
+	fmt.Println("totalScore: ", r.totalScore)
+	fmt.Println()
+	fmt.Println()
+}
+
 func cloneRepo(url string) string {
 	s := subprocess.New("git clone " + url + " src/repos/rnd")
 	if err := s.Exec(); err != nil {
@@ -166,7 +272,7 @@ func cloneRepo(url string) string {
 
 func traverseList(next repo) {
 	for {
-		fmt.Println(next.URL)
+		printRepo(next)
 		if next.next == nil {
 			break
 		}
@@ -180,6 +286,7 @@ func clearRepoFolder() {
 }
 
 func main() {
+	clearRepoFolder()
 
 	file, _ := os.Open(os.Args[1])
 	scanner := bufio.NewScanner(file)
@@ -189,36 +296,12 @@ func main() {
 	prev := &head
 
 	for scanner.Scan() {
-		new := repo{}
-		new.URL = scanner.Text()
-		prev.next = &new
-		prev = &new
+		new := newRepo(scanner.Text())
+		prev.next = new
+		prev = new
 	}
-
-	// s := subprocess.New("../../../test1.sh")
-	// fmt.Println(s.Exec())
 
 	traverseList(head)
-
-	url := head.next
-	for url != nil {
-		fmt.Println(newRepo(url.URL))
-		url = url.next
-
-		// clearRepoFolder()
-	}
-
-	// fmt.Println()
-	// fmt.Println("Cloning...")
-	// clearRepoFolder()
-
-	// url := head.next
-	// for url != nil {
-	// 	fmt.Println(cloneRepo(url.URL))
-	// 	url = url.next
-
-	// 	clearRepoFolder()
-	// }
 
 	fmt.Println("[DONE]")
 
