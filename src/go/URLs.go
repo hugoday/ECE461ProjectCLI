@@ -331,6 +331,26 @@ func repoOUT(r *repo) {
 
 // * END OF STDOUT * \\
 
+// * START OF SORTING * \\
+
+func addRepo(head *repo, curr *repo, temp *repo) *repo {
+	head.next = curr
+	if curr == nil {
+		head.next = temp
+	} else {
+		if curr.netScore >= temp.netScore {
+			curr = addRepo(curr, curr.next, temp)
+		} else {
+			head.next = temp
+			temp.next = curr
+		}
+	}
+
+	return head
+}
+
+// * END OF SORTING * \\
+
 // * START OF MAIN * \\
 
 func main() {
@@ -343,20 +363,15 @@ func main() {
 
 	// Create head and temporary repo nodes
 	var head *repo
-	var temp *repo
+	var hold *repo
 	head = &repo{URL: "HEAD"}
-	temp = &repo{URL: "temp"}
-
-	// Starts the linked list
-	head.next = temp
 
 	for scanner.Scan() {
 		//Create new repositories with current URL scanned
-		temp.next = newRepo(scanner.Text())
-
+		hold = newRepo(scanner.Text())
+		head = addRepo(head, head.next, hold)
 		// Add New Repo to linked list
 		// NEEDS TO BE REPLACED WITH SORTING METHOD
-		temp = temp.next
 	}
 
 	//
