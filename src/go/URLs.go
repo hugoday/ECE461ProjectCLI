@@ -42,6 +42,9 @@ type repo struct {
 
 // this is a function to utilize createing a new repo and initializing each metric within
 func newRepo(url string) *repo {
+
+	fmt.Println(cloneRepo(url))
+
 	r := repo{URL: url}
 	r.busFactor = -1
 	r.correctness = -1
@@ -49,11 +52,11 @@ func newRepo(url string) *repo {
 	r.rampUpTime = -1
 	r.netScore = -1
 
-	//r.busFactor = getBusFactor(r.URL)
-	//r.correctness = getCorrectness(r.URL)
+	r.busFactor = getBusFactor(r.URL)
+	// r.correctness = getCorrectness(r.URL)
 	//r.licenseCompatibility = getLicenseCompatibility(r.URL)
 	//r.rampUpTime = getRampUpTime(r.URL)
-	r.responsiveness = getResponsiveness(r.URL)
+	// r.responsiveness = getResponsiveness(r.URL)
 	//r.totalScore = r.busFactor + int(r.correctness*20) + r.licenseCompatibility + r.rampUpTime + r.responsiveness
 	return &r
 }
@@ -109,9 +112,64 @@ func getRampUpTime(url string) int {
 // * START OF BUS FACTOR * \\
 
 // Function to get bus factor metric score
-func getBusFactor(url string) int {
+func getBusFactor(url string) float64 {
+	make_shortlog_file(url)
+	regex, _ := regexp.Compile("[0-9]+") //Regex for parsing count into only integer
 
-	return -1
+	short_log_raw_data, err1 := os.ReadFile("shortlog.txt")
+	if err1 != nil {
+		fmt.Println("Did not find shortlog file")
+		log.Fatal(err1)
+	}
+
+	arr := strings.Split(string(short_log_raw_data), "\n") // parsing shortlog file by lines
+	
+	len_log := len(arr) - 1
+	
+	var num_bus_committers int
+	if len_log < 100{
+		num_bus_committers = 1
+	}else{
+		num_bus_committers = len_log / 100
+	}
+
+	total := 0
+	total_bus_guys := 0
+	var num string
+
+	for i := 0; i < len_log; i++ {
+		num = regex.FindString(arr[i])
+		num_int, err2 := strconv.Atoi(num)
+		if err2 != nil{
+			fmt.Println("Conversion from string to int didn't work (bus factor calc)")
+			log.Fatal(err2)
+		}
+		total += num_int
+		if i >= len_log - num_bus_committers{
+			total_bus_guys += num_int
+		}
+	}
+	delete_shortlog_file()
+	metric := (float64(total) - float64(total_bus_guys)) / float64(total)
+	return metric
+}
+
+
+func make_shortlog_file(url string){
+
+	//peepee
+	var command string
+	command = "python3 src/python/shortlog_make.py \"" + url + "\" >> src/python/shortlog.txt"
+	s := subprocess.New(command, subprocess.Shell)
+	s.Exec()
+
+}
+
+func delete_shortlog_file(){
+	var command string
+	command = "python3 src/python/shortlog_delete.py"
+	s := subprocess.New(command, subprocess.Shell)
+	s.Exec()
 
 }
 
@@ -295,11 +353,12 @@ func checkFileForLicense(path string) bool {
 // * START OF REPO CLONING/REMOVING  * \\
 
 func cloneRepo(url string) string {
-	s := subprocess.New("git clone " + url + " src/repos/rnd")
+	fmt.Println("cloning repo")
+	s := subprocess.New("git clone " + url + " src/repos", subprocess.Shell)
 	if err := s.Exec(); err != nil {
 		log.Fatal(err)
 		fmt.Println(err)
-		return ("ERROR")
+		return ("ERROR CLONING")
 	}
 	return string("SUCCESS")
 }
