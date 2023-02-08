@@ -1,13 +1,14 @@
 import requests
 from dateutil import parser
 import datetime
+import sys
 
 # Used for authentication
-headers = {"Authorization":  "token <token> "}
+headers = {"Authorization":  "token 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 "}
 
 # Call this function in Go, pass in a URL, returns a score for responsiveness
 def graphQLMetric(url):
-
+    type(url)
     # Number of commits to check for in Repository
     maxCommits = 100
 
@@ -53,7 +54,6 @@ def graphQLMetric(url):
     result = performQuery(query, variables) # Perform the query
     if result == 0: # If Query request has an expection
       return 0
-
     # Takes results from Query and returns repo origin, commits this year, total commits (capped at maxCommits)
     repoDate, commitsThisYear, totalCommits = parseGraphQLresult(result, maxCommits)
 
@@ -61,7 +61,6 @@ def graphQLMetric(url):
     score = calculateResponsiveness(repoDate, commitsThisYear, totalCommits, maxCommits)
 
     # Return score
-    print(score)
     return score 
 
 # Performs the Query, takes in query and variables, returns request.json
@@ -75,7 +74,6 @@ def performQuery(query, variables):
 
 # Parses GraphQL results for scoring, recieves results, and maxCommits, returns score
 def parseGraphQLresult(result, maxCommits):
-
     # Declare Variables
     totalCommits = 0
     commitsThisYear = 0
@@ -84,7 +82,7 @@ def parseGraphQLresult(result, maxCommits):
     lastYear = datetime.date.today() - datetime.timedelta(days=365)
 
     # Get Repo origin date
-    repoDate, time = result['data']['resource']['createdAt'].split('T') # Removes time from datetime
+    repoDate, z  = result['data']['resource']['createdAt'].split('T')# Removes time from datetime
     repoDate = datetime.date.fromisoformat(repoDate) # Converts repo origin date to desired format
 
     # Checks each commit to see if it was within the last year
@@ -130,10 +128,9 @@ def calculateResponsiveness(repoDate, commitsThisYear, totalCommits, maxCommits)
       else:
         score = 10 * commitsThisYear / maxCommits
     
-    return score # returns Responsiveness Score
+    return score / 20 # returns Responsiveness Score on scale of [0,1]
 
-#if __name__ == "__main__":
-#    graphQLMetric("https://github.com/cloudinary/cloudinary_npm")
-#    graphQLMetric("https://github.com/hugoday/ECE461ProjectCLI")
-#    graphQLMetric("https://github.com/nullivex/nodist")
-#    graphQLMetric("https://github.com/lodash/lodash")
+if __name__ == "__main__":
+  score = graphQLMetric(sys.argv[1])
+  print(score)
+  

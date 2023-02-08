@@ -11,7 +11,7 @@ def getIssues(url=""):
   print()
   print()
   print(url)
-  token = os.getenv("GITHUB_TOKEN")
+  token = os.getenv("<token>")
   print(token)
   print()
   print()
