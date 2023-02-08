@@ -47,7 +47,3 @@ func main(){
 
 	fmt.Println(metric) //return statement
 }
-
-func print (in string){
-	fmt.Println(in)
-}
