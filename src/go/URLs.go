@@ -134,7 +134,7 @@ func getCorrectness(url string) float64 {
 	num_regex, _ := regexp.Compile("[0-9]+")              //Regex for parsing count into only integer
 
 	//closed issues
-	data_closed, err1 := os.ReadFile("./src/python/issues/closed.txt")
+	data_closed, err1 := os.ReadFile("./src/issues/closed.txt")
 	if err1 != nil {
 		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
 		log.Fatal(err1)
@@ -144,7 +144,7 @@ func getCorrectness(url string) float64 {
 	closed_count = num_regex.FindString(closed_count)
 
 	//open issues
-	data_open, err := os.ReadFile("./src/python/issues/open.txt")
+	data_open, err := os.ReadFile("./src/issues/open.txt")
 	if err != nil {
 		fmt.Println("Did not find open issues file from api, invalid url: " + url)
 		log.Fatal(err)
@@ -175,42 +175,12 @@ func runRestApi(url string) {
 	}
 	url = url[index+5:]
 	
-	// token := os.Getenv("GITHUB_TOKEN")
-// 	code := `'import os;
-// os.remove("src/python/issues/closed.txt") if os.path.exists("src/python/issues/closed.txt") else "continue";
-// os.remove("src/python/issues/open.txt") if os.path.exists("src/python/issues/open.txt") else "continue";
-// os.system("curl -i -H "Authorization: token ` + token + `" https://api.github.com/search/issues?q=repo:` + url + `+type:issue+state:closed >> src/python/issues/closed.txt");
-// os.system("curl -i -H "Authorization: token ` + token + `" https://api.github.com/search/issues?q=repo:` + url + `+type:issue+state:open >> src/python/issues/open.txt");'`
-
-	command := "python3 -c 'import os; os.remove(\"src/python/issues/closed.txt\") if os.path.exists(\"src/python/issues/closed.txt\") else \"continue\";	os.remove(\"src/python/issues/open.txt\") if os.path.exists(\"src/python/issues/open.txt\") else \"continue\"; os.system(\"curl -i -H \"Authorization: token [TOKEN]\" https://api.github.com/search/issues?q=repo:hugoday/resume+type:issue+state:closed >> src/python/issues/closed.txt\"); os.system(\"curl -i -H \"Authorization: token [TOKEN]\" https://api.github.com/search/issues?q=repo:hugoday/resume+type:issue+state:open >> src/python/issues/open.txt\");'"
-	// cmd := exec.Command("python3", "-c", code)
-	// fmt.Println(token)
-	// fmt.Println(cmd)
-
-	// err := cmd.Run()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	token := os.Getenv("GITHUB_TOKEN")
+	fmt.Println(token,url)
+	command := "python3 -c 'import os; os.remove(\"src/issues/closed.txt\") if os.path.exists(\"src/issues/closed.txt\") else \"continue\"; os.remove(\"src/issues/open.txt\") if os.path.exists(\"src/issues/open.txt\") else \"continue\"; os.system(\"curl -i -H \\\"Authorization: token "+token+"\\\" https://api.github.com/search/issues?q=repo:"+url+"+type:issue+state:closed >> src/issues/closed.txt\"); os.system(\"curl -i -H \\\"Authorization: token "+token+"\\\" https://api.github.com/search/issues?q=repo:"+url+"+type:issue+state:open >> src/issues/open.txt\");'"
 
 	r := subprocess.New(command, subprocess.Shell)
 	r.Exec()
-	
-
-//  python3 -c 'import os; os.remove("src/python/issues/closed.txt") if os.path.exists("src/python/issues/closed.txt") else "continue";	os.remove("src/python/issues/open.txt") if os.path.exists("src/python/issues/open.txt") else "continue"; os.system("curl -i -H "Authorization: token [TOKEN]" https://api.github.com/search/issues?q=repo:hugoday/resume+type:issue+state:closed >> src/python/issues/closed.txt"); os.system("curl -i -H "Authorization: token [TOKEN]" https://api.github.com/search/issues?q=repo:hugoday/resume+type:issue+state:open >> src/python/issues/open.txt");'
-
-
-
-	// setup := "\"import sys; sys.path.append('../'); from src.python import rest_api;"
-	// // cmd := exec.Command("python", "-c", setup+"rest_api.getIssues(\\\""+url+"\\\")\"")
-
-	// s := subprocess.New("python -c " + setup + "rest_api.getIssues(\\\"" + url + "\")\"")
-	// fmt.Println(s)
-	// if err := s.Exec(); err != nil {
-	// 	log.Fatal(err)
-	// 	fmt.Println(err)
-	// 	// eturn r("ERROR")
-	// }
-	// return string("SUCCESS")
 	return
 }
 
@@ -225,12 +195,12 @@ func teardownRestApi() {
 
 func calc_score(s1 string, s2 string) float64 {
 
+	fmt.Println(s1)
+	fmt.Println(s2)
 	f1, err := strconv.ParseFloat(s1, 32)
-	// fmt.Println(s1)
 	if err != nil {
 		fmt.Println("Conversion of s1 to string float didn't work.")
 	}
-	// fmt.Println(s2)
 	f2, err1 := strconv.ParseFloat(s2, 32)
 	if err1 != nil {
 		fmt.Println("Conversion of s2 to string float didn't work.")
