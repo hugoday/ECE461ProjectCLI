@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	// "reflect"
 
 	"github.com/estebangarcia21/subprocess"
 	// "subprocess"
@@ -31,6 +32,7 @@ import (
 // where we will pass urls by accessing the repo's url
 type repo struct {
 	URL                  string
+	repoName			 string
 	responsiveness       float64
 	correctness          float64
 	rampUpTime           float64
@@ -43,21 +45,26 @@ type repo struct {
 // this is a function to utilize createing a new repo and initializing each metric within
 func newRepo(url string) *repo {
 
-	fmt.Println(cloneRepo(url))
 
 	r := repo{URL: url}
+	r.repoName =(cloneRepo(url))
 	r.busFactor = -1
 	r.correctness = -1
 	r.licenseCompatibility = -1
 	r.rampUpTime = -1
 	r.netScore = -1
-
-	r.busFactor = getBusFactor(r.URL)
+	// make_shortlog_file("ECE461ProjectCLI")
+	r.busFactor = getBusFactor(r.repoName)
+	// fmt.Printf("%f", r.busFactor)
 	// r.correctness = getCorrectness(r.URL)
 	//r.licenseCompatibility = getLicenseCompatibility(r.URL)
 	//r.rampUpTime = getRampUpTime(r.URL)
 	// r.responsiveness = getResponsiveness(r.URL)
 	//r.totalScore = r.busFactor + int(r.correctness*20) + r.licenseCompatibility + r.rampUpTime + r.responsiveness
+
+	// s := subprocess.New("rmdir --ignore-fail-on-non-empty " + r.repoName, subprocess.Shell)
+	// s.Exec()
+
 	return &r
 }
 
@@ -126,6 +133,12 @@ func getBusFactor(url string) float64 {
 	
 	len_log := len(arr) - 1
 	
+	if len_log == 0{
+		fmt.Println("No committers for repo " + url)
+		delete_shortlog_file()
+		return 0
+	}
+	
 	var num_bus_committers int
 	if len_log < 100{
 		num_bus_committers = 1
@@ -136,6 +149,8 @@ func getBusFactor(url string) float64 {
 	total := 0
 	total_bus_guys := 0
 	var num string
+
+	fmt.Println(len_log)
 
 	for i := 0; i < len_log; i++ {
 		num = regex.FindString(arr[i])
@@ -149,25 +164,47 @@ func getBusFactor(url string) float64 {
 			total_bus_guys += num_int
 		}
 	}
-	delete_shortlog_file()
+	// delete_shortlog_file()
 	metric := (float64(total) - float64(total_bus_guys)) / float64(total)
+	fmt.Println(metric)
 	return metric
 }
 
 
 func make_shortlog_file(url string){
 
-	//peepee
+	out, _ := exec.Command("shortlog_run.sh").Output()
+	print(out)
+	// var command string
+	// command = "python3 src/python/shortlog_make.py " + url + " >> test.txt"
+	// s := subprocess.New(command, subprocess.Shell)
+	// s.Exec()
+	// url_real := strings.Split(url, "/")
+	// fmt.Println(reflect.TypeOf(url_real))
+	// s := subprocess.New("cd " + url, subprocess.Shell)
+	// s.Exec()
+	dor, _ := os.Getwd()
+	fmt.Println("current dir is " + dor)
+	// s1 := subprocess.New("./shortlog_run.sh " + url, subprocess.Shell)
+
+	// s1 := subprocess.New("python3 src/python/shortlog_make.py " + url, subprocess.Shell)
+
+	// s1.Exec()
 	var command string
-	command = "python3 src/python/shortlog_make.py \"" + url + "\" >> src/python/shortlog.txt"
-	s := subprocess.New(command, subprocess.Shell)
-	s.Exec()
+	command = "python3 -c 'import os ; os.system(\"git shortlog -se | sort -n\")'"
+	s3 := subprocess.New(command, subprocess.Shell)
+	s3.Exec()
+
+	dor, _ = os.Getwd()
+	fmt.Println("current dir is " + dor)
+
+	fmt.Println("done done")
 
 }
 
 func delete_shortlog_file(){
 	var command string
-	command = "python3 src/python/shortlog_delete.py"
+	command = "rm shortlog.txt"
 	s := subprocess.New(command, subprocess.Shell)
 	s.Exec()
 
@@ -354,13 +391,22 @@ func checkFileForLicense(path string) bool {
 
 func cloneRepo(url string) string {
 	fmt.Println("cloning repo")
-	s := subprocess.New("git clone " + url + " src/repos", subprocess.Shell)
+	s := subprocess.New("git clone " + url, subprocess.Shell)
 	if err := s.Exec(); err != nil {
 		log.Fatal(err)
 		fmt.Println(err)
 		return ("ERROR CLONING")
 	}
-	return string("SUCCESS")
+	index := strings.Index(url, ".com/")
+	if index == -1 {
+		fmt.Println("No '.com/' found in the string")
+		return "FAILURE"
+	}
+	
+	url = url[index+5:]
+	r, _ := regexp.Compile("/")
+	a := r.Split(url, 2)
+	return a[1]
 }
 
 func clearRepoFolder() {

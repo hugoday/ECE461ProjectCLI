@@ -1,5 +1,0 @@
-running shortlog for https://github.com/hugoday/ECE461ProjectCLI
-running shortlog for ECE461ProjectCLI
-running shortlog for ECE461ProjectCLI
-running shortlog for ECE461ProjectCLI
-running shortlog for ECE461ProjectCLI

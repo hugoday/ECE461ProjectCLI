@@ -1,17 +1,19 @@
 import os, sys, re
 
 def run_shortlog(url):
-    url = re.findall("https://github.com/([\w-]+)/([\w-]+)", url)[0][1]
-    orig_dir = os.getcwd()
-    repo_dir = 'src/repos' + '/' + url
-
+# /    print("making dir " + url)
+    # repo_dir = 'src/repos' + '/' + url
+    # # url = url.split('/')[-1]
+    # print(url)
     print("running shortlog for " + url)
+    
     if os.path.exists("shortlog.txt"):
         os.system("rm shortlog.txt")
-
-    os.chdir(repo_dir)
-    os.system("git shortlog -se | sort -n >> shortlog.txt")
+    os.chdir(url)
+    # print("in dir" + os.getcwd())
+    os.system("git shortlog -se | sort -n")
     # os.system("mv shortlog.txt " + "src/go")
+    # print("curr dir is " + os.getcwd())
 
 
 
