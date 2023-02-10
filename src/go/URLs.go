@@ -123,7 +123,7 @@ func getBusFactor(url string) float64 {
 	make_shortlog_file(url)
 	regex, _ := regexp.Compile("[0-9]+") //Regex for parsing count into only integer
 
-	short_log_raw_data, err1 := os.ReadFile("shortlog.txt")
+	short_log_raw_data, err1 := os.ReadFile(url + "/shortlog.txt")
 	if err1 != nil {
 		fmt.Println("Did not find shortlog file")
 		log.Fatal(err1)
@@ -133,9 +133,9 @@ func getBusFactor(url string) float64 {
 	
 	len_log := len(arr) - 1
 	
-	if len_log == 0{
+	if len_log < 1{
 		fmt.Println("No committers for repo " + url)
-		delete_shortlog_file()
+		delete_shortlog_file(url)
 		return 0
 	}
 	
@@ -160,11 +160,11 @@ func getBusFactor(url string) float64 {
 			log.Fatal(err2)
 		}
 		total += num_int
-		if i >= len_log - num_bus_committers{
+		if i < num_bus_committers{
 			total_bus_guys += num_int
 		}
 	}
-	// delete_shortlog_file()
+	delete_shortlog_file(url)
 	metric := (float64(total) - float64(total_bus_guys)) / float64(total)
 	fmt.Println(metric)
 	return metric
@@ -172,39 +172,32 @@ func getBusFactor(url string) float64 {
 
 
 func make_shortlog_file(url string){
+	os.Chdir(url)
 
-	out, _ := exec.Command("shortlog_run.sh").Output()
-	print(out)
-	// var command string
-	// command = "python3 src/python/shortlog_make.py " + url + " >> test.txt"
-	// s := subprocess.New(command, subprocess.Shell)
-	// s.Exec()
-	// url_real := strings.Split(url, "/")
-	// fmt.Println(reflect.TypeOf(url_real))
-	// s := subprocess.New("cd " + url, subprocess.Shell)
-	// s.Exec()
-	dor, _ := os.Getwd()
-	fmt.Println("current dir is " + dor)
-	// s1 := subprocess.New("./shortlog_run.sh " + url, subprocess.Shell)
+	cmd := exec.Command("git","shortlog","HEAD","-se", "-n")
+	cwd, _ := os.Getwd()
 
-	// s1 := subprocess.New("python3 src/python/shortlog_make.py " + url, subprocess.Shell)
+	fmt.Println("dir is " + cwd)
 
-	// s1.Exec()
-	var command string
-	command = "python3 -c 'import os ; os.system(\"git shortlog -se | sort -n\")'"
-	s3 := subprocess.New(command, subprocess.Shell)
-	s3.Exec()
+	out,err := cmd.Output()
 
-	dor, _ = os.Getwd()
-	fmt.Println("current dir is " + dor)
+	if err != nil{
+		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
+		log.Fatal(err)	
+	}
 
-	fmt.Println("done done")
+	os.WriteFile("shortlog.txt", out, 0644)
+
+	os.Chdir("../")
+	
+	cwd, _ = os.Getwd()
+	fmt.Println("dir is " + cwd)
 
 }
 
-func delete_shortlog_file(){
+func delete_shortlog_file(url string){
 	var command string
-	command = "rm shortlog.txt"
+	command = "rm -f " + url + "/shortlog.txt"
 	s := subprocess.New(command, subprocess.Shell)
 	s.Exec()
 
