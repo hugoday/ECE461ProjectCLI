@@ -1,10 +1,376 @@
-{"URL":"https://github.com/cloudinary/cloudinary_npm", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":1, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/torvalds/linux", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":1, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/raspberrypi/linux", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":1, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/AlDanial/cloc", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":1, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/esp8266/Arduino", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":1, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/doomemacs/themes", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":0.765, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/hugoday/ECE461ProjectCLI", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":0.05, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/nullivex/nodist", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":0.03, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/lodash/lodash", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":0, "LICENSE_SCORE":-1}
-{"URL":"https://github.com/bpembert/ECE39595J", "NET_SCORE":-1, "RAMP_UP_SCORE":-1,"CORRECTNESS_SCORE":-1, "BUS_FACTOR_SCORE":-1, "RESPONSIVE_MAINTAINER_SCORE":0, "LICENSE_SCORE":-1}
+       1 text file.
+       1 unique file.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.01 s (137.1 files/s, 137.1 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Python                           1              0              0              1
+-------------------------------------------------------------------------------
+       1 text file.
+       1 unique file.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.01 s (131.5 files/s, 131.5 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Python                           1              0              0              1
+-------------------------------------------------------------------------------
+       1 text file.
+       1 unique file.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.01 s (142.3 files/s, 142.3 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Python                           1              0              0              1
+-------------------------------------------------------------------------------
+       1 text file.
+       1 unique file.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.01 s (127.2 files/s, 127.2 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Python                           1              0              0              1
+-------------------------------------------------------------------------------
+       1 text file.
+       1 unique file.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.01 s (117.3 files/s, 1525.5 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Markdown                         1              4              0              9
+-------------------------------------------------------------------------------
+      51 text files.
+classified 51 files      51 unique files.                              
+      19 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.07 s (484.5 files/s, 148316.5 lines/s)
+--------------------------------------------------------------------------------
+Language                      files          blank        comment           code
+--------------------------------------------------------------------------------
+C                                14           1550            244           6122
+C/C++ Header                     13            278            218            855
+Python                            2             60             68            290
+Bourne Again Shell                1             31             19            121
+make                              1             29             19            116
+Markdown                          1             20              0             45
+Bourne Shell                      1              6              4              8
+--------------------------------------------------------------------------------
+SUM:                             33           1974            572           7557
+--------------------------------------------------------------------------------
+     100 files     175 text files.
+classified 175 filesDuplicate file check 175 files (174 known unique)Unique:      100 files                                               175 unique files.                              
+Counting:  100       8 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.21 s (828.3 files/s, 127390.4 lines/s)
+--------------------------------------------------------------------------------
+Language                      files          blank        comment           code
+--------------------------------------------------------------------------------
+JavaScript                      130           1762           2426          17393
+TypeScript                        2            461            157           1623
+Markdown                          6            258              0            808
+EJS                              10             52              6            418
+CSS                               1              0              0            216
+JSON                              8              1              0            177
+Bourne Again Shell                1             34             32            171
+Bourne Shell                      9              9             17             52
+HTML                              1              8              0             33
+YAML                              1              2              0             20
+XML                               1              0              0             11
+--------------------------------------------------------------------------------
+SUM:                            170           2587           2638          20922
+--------------------------------------------------------------------------------
+      34 text files.
+classified 34 files      34 unique files.                              
+      12 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.04 s (630.0 files/s, 110201.0 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       9            177            473           1652
+JSON                             2              0              0            645
+Go                               3            110             28            425
+Markdown                         1            149              0            344
+PowerShell                       3             38              0             62
+Bourne Shell                     3              2              0             40
+XML                              1              0              1             24
+DOS Batch                        2              5              0             23
+-------------------------------------------------------------------------------
+SUM:                            24            481            502           3215
+-------------------------------------------------------------------------------
+     100 files     200 files     300 files     400 files     500 files     600 files     700 files     714 text files.
+classified 714 filesDuplicate file check 714 files (596 known unique)Unique:      100 files                                          Unique:      200 files                                          Unique:      300 files                                          Unique:      400 files                                          Unique:      500 files                                               714 unique files.                              
+Counting:  100Counting:  200Counting:  300Counting:  400Counting:  500Counting:  600Counting:  700       6 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.56 s (1275.2 files/s, 66718.1 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                     702           5469           6699          22980
+JSON                             2              0              0           1720
+Markdown                         3             51              0            134
+YAML                             2             10              8             25
+-------------------------------------------------------------------------------
+SUM:                           709           5530           6707          24859
+-------------------------------------------------------------------------------
+       0 text files.
+       0 unique files.                              
+       0 files ignored.
+       0 text files.
+       0 unique files.                              
+       0 files ignored.
+     100 files     200 files     300 files     400 files     500 files     600 files     700 files     776 text files.
+classified 768 filesDuplicate file check 768 files (425 known unique)Unique:      100 files                                          Unique:      200 files                                          Unique:      300 files                                          Unique:      400 files                                               709 unique files.                              
+Counting:  100Counting:  200Counting:  300Counting:  400Counting:  500Counting:  600Counting:  700     139 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.69 s (924.9 files/s, 93934.8 lines/s)
+----------------------------------------------------------------------------------------
+Language                              files          blank        comment           code
+----------------------------------------------------------------------------------------
+Perl                                      8           2316           5089          26174
+YAML                                    357             12            359           8628
+Markdown                                  3            305             32           2867
+ANTLR Grammar                             2            200             59           1012
+R                                         3             95            312            698
+C/C++ Header                              1            191            780            617
+C++                                      11            132            183            603
+Forth                                     2             17             84            529
+TypeScript                                4             53             39            416
+Logtalk                                   1             59             57            368
+C                                         7            110             72            354
+Windows Message File                      2             89              9            348
+TeX                                       2             36             64            265
+Racket                                    1             32            159            247
+make                                      4             85            159            247
+SVG                                       1             19              4            242
+Glade                                     1              0             22            232
+DIET                                      1             10              4            230
+Windows Resource File                     1             42             45            218
+Assembly                                  4             40            143            204
+CSV                                       1              0              0            158
+ReScript                                  1             31             43            157
+Juniper Junos                             1              0              8            129
+Zig                                       1              2             10            128
+Idris                                     2             38             90            117
+ECPP                                      1             26             34            116
+Prolog                                    2             43              8            114
+Ruby                                      1             11             30            111
+Hoon                                      1              0             10            110
+Imba                                      1             71             30            108
+Dockerfile                                3             18             13            106
+Thrift                                    1             57            134             97
+Bourne Shell                              5             14             10             96
+Bourne Again Shell                        1             11             19             92
+Xtend                                     1             17             52             91
+BizTalk Orchestration                     1              1              3             90
+Lean                                      1             36             20             90
+Odin                                      1             32             56             90
+Smalltalk                                 2             19              5             85
+Vuejs Component                           1             10              2             85
+Java                                      5             13             28             81
+Scheme                                    1             10             18             78
+MXML                                      1             23              5             74
+MATLAB                                    3              3             11             68
+Oracle PL/SQL                             1              0             15             67
+Haml                                      1              5             16             66
+Sass                                      2             16              1             66
+Visual Basic                              2             44             55             66
+Swift                                     1             23             13             65
+Fish Shell                                1             14             47             62
+RAML                                      1              5              3             62
+Verilog-SystemVerilog                     1              4             20             62
+Clean                                     1             10             30             58
+Qt Linguist                               1              0              4             57
+SaltStack                                 1              6              1             55
+Meson                                     1             13              9             48
+JSON                                      3              0              0             46
+Fennel                                    1              6              3             44
+JCL                                       1              0             18             44
+HCL                                       1             14             36             43
+Nim                                       1              5             13             43
+Nix                                       1             15             15             43
+Go                                        3             14             41             40
+ASP.NET                                   2             16             21             39
+Raku                                      1             19             12             39
+SQL                                       3             24             36             39
+Agda                                      1             10              3             38
+Ring                                      1             11             11             38
+Web Services Description                  1              4              0             36
+COBOL                                     3              5              8             35
+Haskell                                   4             23             26             35
+RobotFramework                            1              9              5             35
+AsciiDoc                                  1             17             27             34
+EJS                                       1              0             11             34
+Godot Scene                               1              4              8             34
+IPL                                       1              6             15             33
+PO File                                   1              9             18             33
+GLSL                                      1             10             14             32
+WebAssembly                               1              8             20             32
+Mustache                                  2              5              7             31
+Specman e                                 2              4             12             31
+Squirrel                                  1              6              4             31
+Python                                    7             16             54             30
+Apex Class                                1              3              6             28
+C# Designer                               1              8             22             28
+Cake Build Script                         1              6              6             28
+Cucumber                                  1              3              2             28
+Drools                                    1              7             16             28
+Puppet                                    2              2              4             28
+Freemarker Template                       1              0              2             27
+Bazel                                     1              7              1             26
+PHP                                       2             11             13             26
+GraphQL                                   2              3              3             25
+LFE                                       1             15             21             25
+Objective-C                               1             11             11             25
+Scala                                     1              8              8             25
+Visual Studio Solution                    1              0              1             25
+Brainfuck                                 1              1              3             24
+Fortran 90                                6              1             18             24
+Haxe                                      1             26             99             24
+Lisp                                      1              5             26             24
+Pascal                                    6              4             19             24
+C#                                        4              9              7             23
+Blade                                     1             10              5             22
+JSON5                                     1              0              4             22
+Mathematica                               2             24             17             22
+Stata                                     1              7              7             22
+TOML                                      1              8              4             22
+Gleam                                     1              6             41             21
+Jupyter Notebook                          1              0            126             21
+Smarty                                    1              1              1             21
+Godot Resource                            1              2              8             20
+BrightScript                              1              0              3             19
+Igor Pro                                  1              4              6             19
+PL/M                                      1              1              5             19
+Solidity                                  1              0              2             19
+TTCN                                      1             11             16             19
+XSLT                                      2              0              4             19
+Windows Module Definition                 1              1              1             18
+Gradle                                    1              0              2             17
+Mojo                                      1              6              4             17
+Razor                                     2              6              7             17
+Logos                                     2              6              3             16
+Gencat NLS                                1              1              4             15
+JavaScript                                5              3              0             15
+Pig Latin                                 1             19             40             15
+SWIG                                      1              4              4             15
+TNSDL                                     1              5              3             15
+Embedded Crystal                          1              4              4             14
+F#                                        1              3              6             14
+IDL                                       2             25              7             14
+SugarSS                                   1              5              4             13
+Velocity Template Language                1              0             20             13
+Starlark                                  1              3              4             11
+Jinja Template                            1              0              6             10
+Slim                                      1              0              3             10
+reStructuredText                          1              6              4             10
+Kotlin                                    1              0              3              9
+Mako                                      1              3              8              9
+Svelte                                    1              2              2              9
+Vala                                      1              0              5              9
+XML                                       3              0              5              9
+F# Script                                 1              1              2              8
+FXML                                      1              2              3              8
+SparForte                                 1              6              8              8
+WXML                                      1              3              2              8
+C# Generated                              1              2             16              7
+Elixir                                    1              3             10              7
+Fortran 77                                2              1              8              7
+INI                                       1              2              3              7
+Lua                                       3              9             33              7
+Chapel                                    1              7             35              6
+VB for Applications                       1              4              2              6
+Julia                                     2              4             15              5
+PL/I                                      1              0              7              5
+APL                                       1              3              6              4
+Arduino Sketch                            1              1              5              4
+ReasonML                                  1              2              8              4
+Rmd                                       1             10             19              4
+WXSS                                      1              0              0              4
+Elm                                       2              0              5              3
+Groovy                                    1              0              3              3
+LLVM IR                                   1              2              6              3
+Literate Idris                            1              2              2              3
+NAnt script                               1              1              0              3
+OCaml                                     1              0              5              3
+ProGuard                                  1              7             14              3
+Tcl/Tk                                    1              1              2              3
+dhall                                     1              6             17              3
+ColdFusion                                1              1              2              2
+DOS Batch                                 1              1              2              2
+Focus                                     1              1              2              1
+MUMPS                                     1              0              2              1
+XQuery                                    1              0              1              1
+xBase                                     1              0              9              1
+----------------------------------------------------------------------------------------
+SUM:                                    640           5117           9906          49976
+----------------------------------------------------------------------------------------
+     100 files     200 files     300 files     400 files     500 files     600 files     700 files     800 files     900 files    1000 files    1100 files    1122 text files.
+classified 1120 filesDuplicate file check 1120 files (1031 known unique)Unique:      100 files                                          Unique:      200 files                                          Unique:      300 files                                          Unique:      400 files                                          Unique:      500 files                                          Unique:      600 files                                          Unique:      700 files                                          Unique:      800 files                                          Unique:      900 files                                          Unique:     1000 files                                              1115 unique files.                              
+Counting:  100Counting:  200Counting:  300Counting:  400Counting:  500Counting:  600Counting:  700Counting:  800Counting:  900Counting:  1000Counting:  1100     170 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=1.30 s (743.0 files/s, 164287.5 lines/s)
+--------------------------------------------------------------------------------
+Language                      files          blank        comment           code
+--------------------------------------------------------------------------------
+C/C++ Header                    412          12744          35308          47123
+C++                             201           9190          11372          44922
+Arduino Sketch                  181           3630           3819          13518
+reStructuredText                 42           3109           1840           5063
+Python                           31            779            878           4772
+C                                19            652            685           3277
+Markdown                         22            791              0           1947
+HTML                              5            186             11           1569
+Bourne Shell                     20            309            137           1230
+SVG                               1              1              1           1185
+make                              7            133             17            615
+YAML                             12             59             70            508
+Assembly                          3             96            248            461
+JSON                              4              0              0            432
+Bourne Again Shell                2             57             37            132
+CSS                               1              3              0              7
+--------------------------------------------------------------------------------
+SUM:                            963          31739          54423         126761
+--------------------------------------------------------------------------------
+       1 text file.
+       1 unique file.                              
+       2 files ignored.
+      97 text files.
+classified 97 files      97 unique files.                              
+       5 files ignored.
+
+github.com/AlDanial/cloc v 1.90  T=0.11 s (878.7 files/s, 192261.6 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Lisp                            82           1822           3312          14511
+YAML                             9              7              0            372
+Markdown                         1             33              0            279
+make                             1              4              0              8
+-------------------------------------------------------------------------------
+SUM:                            93           1866           3312          15170
+-------------------------------------------------------------------------------
+       0 text files.
+       0 unique files.                              
+       0 files ignored.
+       0 text files.
+       0 unique files.                              
+       0 files ignored.
+       0 text files.
+       0 unique files.                              
+       0 files ignored.
+       0 text files.
+       0 unique files.                              
+       0 files ignored.
+       0 text files.
+       0 unique files.                              
+       0 files ignored.
