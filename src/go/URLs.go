@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	// "reflect"
 
 	"github.com/estebangarcia21/subprocess"
 	// "subprocess"
@@ -31,6 +32,7 @@ import (
 // where we will pass urls by accessing the repo's url
 type repo struct {
 	URL                  string
+	repoName			 string
 	responsiveness       float64
 	correctness          float64
 	rampUpTime           float64
@@ -42,7 +44,10 @@ type repo struct {
 
 // this is a function to utilize createing a new repo and initializing each metric within
 func newRepo(url string) *repo {
+
+
 	r := repo{URL: url}
+	r.repoName =(cloneRepo(url))
 	r.busFactor = -1
 	r.correctness = -1
 	r.licenseCompatibility = -1
@@ -51,13 +56,18 @@ func newRepo(url string) *repo {
 
 	cloneRepo(url)
 
-	//r.busFactor = getBusFactor(r.URL)
-	//r.correctness = getCorrectness(r.URL)
-	// r.licenseCompatibility = getLicenseCompatibility(r.URL)
+	// make_shortlog_file("ECE461ProjectCLI")
+	r.busFactor = getBusFactor(r.repoName)
+
+
+	// //r.correctness = getCorrectness(r.URL)
+	r.licenseCompatibility = getLicenseCompatibility(r.URL)
 	r.rampUpTime = getRampUpTime(r.URL)
 	// r.responsiveness = getResponsiveness(r.URL)
 	//r.totalScore = r.busFactor + int(r.correctness*20) + r.licenseCompatibility + r.rampUpTime + r.responsiveness
 
+	// s := subprocess.New("rmdir --ignore-fail-on-non-empty " + r.repoName, subprocess.Shell)
+	// s.Exec()
 	clearRepoFolder()
 
 	return &r
@@ -67,7 +77,6 @@ func newRepo(url string) *repo {
 
 // * START OF RESPONSIVENESS * \\
 
-// NEED TO IMPLEMENT GITHUB TOKEN CALLING
 // Function to get responsiveness metric score
 func getResponsiveness(url string) float64 {
 	var command string
@@ -129,8 +138,87 @@ func getRampUpTime(url string) float64 {
 // * START OF BUS FACTOR * \\
 
 // Function to get bus factor metric score
-func getBusFactor(url string) int {
-	return -1
+func getBusFactor(url string) float64 {
+	make_shortlog_file(url)
+	regex, _ := regexp.Compile("[0-9]+") //Regex for parsing count into only integer
+
+	short_log_raw_data, err1 := os.ReadFile(url + "/shortlog.txt")
+	if err1 != nil {
+		fmt.Println("Did not find shortlog file")
+		log.Fatal(err1)
+	}
+
+	arr := strings.Split(string(short_log_raw_data), "\n") // parsing shortlog file by lines
+	
+	len_log := len(arr) - 1
+	
+	if len_log < 1{
+		fmt.Println("No committers for repo " + url)
+		delete_shortlog_file(url)
+		return 0
+	}
+	
+	var num_bus_committers int
+	if len_log < 100{
+		num_bus_committers = 1
+	}else{
+		num_bus_committers = len_log / 100
+	}
+
+	total := 0
+	total_bus_guys := 0
+	var num string
+
+	fmt.Println(len_log)
+
+	for i := 0; i < len_log; i++ {
+		num = regex.FindString(arr[i])
+		num_int, err2 := strconv.Atoi(num)
+		if err2 != nil{
+			fmt.Println("Conversion from string to int didn't work (bus factor calc)")
+			log.Fatal(err2)
+		}
+		total += num_int
+		if i < num_bus_committers{
+			total_bus_guys += num_int
+		}
+	}
+	delete_shortlog_file(url)
+	metric := (float64(total) - float64(total_bus_guys)) / float64(total)
+	fmt.Println(metric)
+	return metric
+}
+
+
+func make_shortlog_file(url string){
+	os.Chdir(url)
+
+	cmd := exec.Command("git","shortlog","HEAD","-se", "-n")
+	cwd, _ := os.Getwd()
+
+	fmt.Println("dir is " + cwd)
+
+	out,err := cmd.Output()
+
+	if err != nil{
+		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
+		log.Fatal(err)	
+	}
+
+	os.WriteFile("shortlog.txt", out, 0644)
+
+	os.Chdir("../")
+	
+	cwd, _ = os.Getwd()
+	fmt.Println("dir is " + cwd)
+
+}
+
+func delete_shortlog_file(url string){
+	var command string
+	command = "rm -f " + url + "/shortlog.txt"
+	s := subprocess.New(command, subprocess.Shell)
+	s.Exec()
 
 }
 
@@ -148,7 +236,7 @@ func getCorrectness(url string) float64 {
 	num_regex, _ := regexp.Compile("[0-9]+")              //Regex for parsing count into only integer
 
 	//closed issues
-	data_closed, err1 := os.ReadFile("./src/python/issues/closed.txt")
+	data_closed, err1 := os.ReadFile("./src/issues/closed.txt")
 	if err1 != nil {
 		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
 		log.Fatal(err1)
@@ -158,7 +246,7 @@ func getCorrectness(url string) float64 {
 	closed_count = num_regex.FindString(closed_count)
 
 	//open issues
-	data_open, err := os.ReadFile("./src/python/issues/open.txt")
+	data_open, err := os.ReadFile("./src/issues/open.txt")
 	if err != nil {
 		fmt.Println("Did not find open issues file from api, invalid url: " + url)
 		log.Fatal(err)
@@ -188,46 +276,19 @@ func runRestApi(url string) {
 		return
 	}
 	url = url[index+5:]
-
-	// token := os.Getenv("GITHUB_TOKEN")
-	// 	code := `'import os;
-	// os.remove("src/python/issues/closed.txt") if os.path.exists("src/python/issues/closed.txt") else "continue";
-	// os.remove("src/python/issues/open.txt") if os.path.exists("src/python/issues/open.txt") else "continue";
-	// os.system("curl -i -H "Authorization: token ` + token + `" https://api.github.com/search/issues?q=repo:` + url + `+type:issue+state:closed >> src/python/issues/closed.txt");
-	// os.system("curl -i -H "Authorization: token ` + token + `" https://api.github.com/search/issues?q=repo:` + url + `+type:issue+state:open >> src/python/issues/open.txt");'`
-
-	command := "python3 -c 'import os; os.remove(\"src/python/issues/closed.txt\") if os.path.exists(\"src/python/issues/closed.txt\") else \"continue\";	os.remove(\"src/python/issues/open.txt\") if os.path.exists(\"src/python/issues/open.txt\") else \"continue\"; os.system(\"curl -i -H \"Authorization: token [TOKEN]\" https://api.github.com/search/issues?q=repo:hugoday/resume+type:issue+state:closed >> src/python/issues/closed.txt\"); os.system(\"curl -i -H \"Authorization: token [TOKEN]\" https://api.github.com/search/issues?q=repo:hugoday/resume+type:issue+state:open >> src/python/issues/open.txt\");'"
-	// cmd := exec.Command("python3", "-c", code)
-	// fmt.Println(token)
-	// fmt.Println(cmd)
-
-	// err := cmd.Run()
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	
+	token := os.Getenv("GITHUB_TOKEN")
+	fmt.Println(token,url)
+	command := "python3 -c 'import os; os.remove(\"src/issues/closed.txt\") if os.path.exists(\"src/issues/closed.txt\") else \"continue\"; os.remove(\"src/issues/open.txt\") if os.path.exists(\"src/issues/open.txt\") else \"continue\"; os.system(\"curl -i -H \\\"Authorization: token "+token+"\\\" https://api.github.com/search/issues?q=repo:"+url+"+type:issue+state:closed >> src/issues/closed.txt\"); os.system(\"curl -i -H \\\"Authorization: token "+token+"\\\" https://api.github.com/search/issues?q=repo:"+url+"+type:issue+state:open >> src/issues/open.txt\");'"
 
 	r := subprocess.New(command, subprocess.Shell)
 	r.Exec()
-
-	//  python3 -c 'import os; os.remove("src/python/issues/closed.txt") if os.path.exists("src/python/issues/closed.txt") else "continue";	os.remove("src/python/issues/open.txt") if os.path.exists("src/python/issues/open.txt") else "continue"; os.system("curl -i -H "Authorization: token [TOKEN]" https://api.github.com/search/issues?q=repo:hugoday/resume+type:issue+state:closed >> src/python/issues/closed.txt"); os.system("curl -i -H "Authorization: token [TOKEN]" https://api.github.com/search/issues?q=repo:hugoday/resume+type:issue+state:open >> src/python/issues/open.txt");'
-
-	// setup := "\"import sys; sys.path.append('../'); from src.python import rest_api;"
-	// // cmd := exec.Command("python", "-c", setup+"rest_api.getIssues(\\\""+url+"\\\")\"")
-
-	// s := subprocess.New("python -c " + setup + "rest_api.getIssues(\\\"" + url + "\")\"")
-	// fmt.Println(s)
-	// if err := s.Exec(); err != nil {
-	// 	log.Fatal(err)
-	// 	fmt.Println(err)
-	// 	// eturn r("ERROR")
-	// }
-	// return string("SUCCESS")
 	return
 }
 
 func teardownRestApi() {
 	setup := "import sys; sys.path.append('../'); from src.python import rest_api;"
-	cmd := exec.Command("python", "-c", setup+"rest_api.deleteIssues()")
+	cmd := exec.Command("python3", "-c", setup+"rest_api.deleteIssues()")
 	_, err := cmd.Output()
 	if err != nil {
 		fmt.Println(err)
@@ -236,12 +297,12 @@ func teardownRestApi() {
 
 func calc_score(s1 string, s2 string) float64 {
 
+	fmt.Println(s1)
+	fmt.Println(s2)
 	f1, err := strconv.ParseFloat(s1, 32)
-	// fmt.Println(s1)
 	if err != nil {
 		fmt.Println("Conversion of s1 to string float didn't work.")
 	}
-	// fmt.Println(s2)
 	f2, err1 := strconv.ParseFloat(s2, 32)
 	if err1 != nil {
 		fmt.Println("Conversion of s2 to string float didn't work.")
@@ -277,10 +338,9 @@ func searchForLicenses(folder string) bool {
 		if found {
 			return nil
 		}
-		if info.IsDir() { //skip .git, etc
-			if info.Name()[0] == '.' {
-				return filepath.SkipDir
-			}
+		if info.IsDir() && len(info.Name()) > 0 && info.Name()[0] == '.' {
+			return filepath.SkipDir
+		// }
 		} else {
 			// fmt.Println("Searching for license in: " + path)
 			found = checkFileForLicense(path)
@@ -326,9 +386,18 @@ func cloneRepo(url string) string {
 	if err := s.Exec(); err != nil {
 		log.Fatal(err)
 		fmt.Println(err)
-		return ("ERROR")
+		return ("ERROR CLONING")
 	}
-	return string("SUCCESS")
+	index := strings.Index(url, ".com/")
+	if index == -1 {
+		fmt.Println("No '.com/' found in the string")
+		return "FAILURE"
+	}
+	
+	url = url[index+5:]
+	r, _ := regexp.Compile("/")
+	a := r.Split(url, 2)
+	return a[1]
 }
 
 func clearRepoFolder() {
@@ -380,29 +449,34 @@ func addRepo(head *repo, curr *repo, temp *repo) *repo {
 
 // * START OF MAIN * \\
 
-func main() {
-	// Makes sure repository folder is clear
-	clearRepoFolder()
+// func main() {
+// 	// Makes sure repository folder is clear
+// 	clearRepoFolder()
 
-	// Opens URL file and creates a scanner
-	file, _ := os.Open(os.Args[1])
-	scanner := bufio.NewScanner(file)
+// 	// Opens URL file and creates a scanner
+// 	file, _ := os.Open(os.Args[1])
+// 	scanner := bufio.NewScanner(file)
 
-	// Create head and temporary repo nodes
-	var head *repo
-	var hold *repo
-	head = &repo{URL: "HEAD"}
+// 	// Create head and temporary repo nodes
+// 	var head *repo
+// 	var hold *repo
+// 	head = &repo{URL: "HEAD"}
 
-	for scanner.Scan() {
-		//Create new repositories with current URL scanned
-		hold = newRepo(scanner.Text())
-		head = addRepo(head, head.next, hold)
-		// Add New Repo to linked list
-		// NEEDS TO BE REPLACED WITH SORTING METHOD
-	}
+// 	for scanner.Scan() {
+// 		//Create new repositories with current URL scanned
+// 		hold = newRepo(scanner.Text())
+// 		head = addRepo(head, head.next, hold)
+// 		// Add New Repo to linked list
+// 		// NEEDS TO BE REPLACED WITH SORTING METHOD
+// 	}
 
-	//
-	printRepo(head.next)
-}
+// 	//
+// 	printRepo(head.next)
+// }
 
 // * END OF MAIN * \\
+
+
+func TestFunction() {
+	fmt.Println("done")
+}

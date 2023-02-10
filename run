@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys, getopt, os
 
 #convert into executable
@@ -21,14 +23,14 @@ def main(argv):
     elif arg == "test":
         #run tests
         print("Testing... ")
-        os.system("go run ./test/tests.go")
+        os.system("go test -v -cover ./src/go/*")
         print("[DONE]")
         return 0
     else:
         #URL file maybe
         if not fileExists(arg): return 1
         print("URL time")
-        os.system("go run ./src/go/URLs.go " + arg)
+        os.system("go run ./src/go/main.go ./src/go/URLs.go " + arg)
         return 0
     return 1
 
