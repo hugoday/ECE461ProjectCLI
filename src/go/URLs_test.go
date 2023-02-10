@@ -79,15 +79,87 @@ func TestCalc_score(t *testing.T) {
 
 // Function to get license compatibility metric score
 func TestGetLicenseCompatibility(t *testing.T) {
-	
+	// rescueStdout := os.Stdout
+    // read, w, _ := os.Pipe()
+    // os.Stdout = w
+
+	// // var r repo
+	// // r.URL = "testUrl"
+	// // r.netScore = 7.4
+	// getLicenseCompatibility("testURL")
+
+    // w.Close()
+    // out, _ := ioutil.ReadAll(read)
+    // os.Stdout = rescueStdout
+	// // t.Errorf(string(out))
+	// // t.Errorf("hi")
+	// // t.Fail()
+    // if string(out) != "[LICENSE NOT FOUND]\n" {
+    //     t.Errorf("Expected %s, got %s", "this is value: test", out)
+    // }
 }
 
 func TestSearchForLicenses(t *testing.T) {
-	
+	rescueStdout := os.Stdout
+    read, w, _ := os.Pipe()
+    os.Stdout = w
+
+	// var r repo
+	// r.URL = "testUrl"
+	// r.netScore = 7.4
+	// searchForLicenses("./src")
+
+    w.Close()
+    out, _ := ioutil.ReadAll(read)
+    os.Stdout = rescueStdout
+	// t.Errorf(string(out))
+	// t.Errorf("hi")
+	// t.Fail()
+    if string(out) != "asdf\n" {
+        t.Errorf("Expected %s, got %s", "asdf", out)
+    }
 }
 
-func TestCheckFileForLicense(t *testing.T) {
-	
+func TestCheckFileForLicense1(t *testing.T) {
+	rescueStdout := os.Stdout
+    read, w, _ := os.Pipe()
+    os.Stdout = w
+
+	// var r repo
+	// r.URL = "testUrl"
+	// r.netScore = 7.4
+	checkFileForLicense("./src/does/not/exist")
+
+    w.Close()
+    out, _ := ioutil.ReadAll(read)
+    os.Stdout = rescueStdout
+	// t.Errorf(string(out))
+	// t.Errorf("hi")
+	// t.Fail()
+    if string(out) != "Coudln't open path open ./src/does/not/exist: no such file or directory\n" {
+        t.Errorf("Expected %s, got %s", "Coudln't open path open ./src/does/not/exist: no such file or directory", out)
+    }
+}
+
+func TestCheckFileForLicense2(t *testing.T) {
+	rescueStdout := os.Stdout
+    read, w, _ := os.Pipe()
+    os.Stdout = w
+
+	// var r repo
+	// r.URL = "testUrl"
+	// r.netScore = 7.4
+	checkFileForLicense("main.go")
+
+    w.Close()
+    out, _ := ioutil.ReadAll(read)
+    os.Stdout = rescueStdout
+	// t.Errorf(string(out))
+	// t.Errorf("hi")
+	// t.Fail()
+    if string(out) != "" {
+        t.Errorf("Expected %s, got %s", "nothing", out)
+    }
 }
 
 // * END OF LICENSE COMPATABILITY * \\
@@ -126,8 +198,7 @@ func TestRepoOUT(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-
-    if string(out) != "this is value: test" {
+    if string(out) != "{\"URL\":\"testUrl\", \"NET_SCORE\":7.4, \"RAMP_UP_SCORE\":0,\"CORRECTNESS_SCORE\":0, \"BUS_FACTOR_SCORE\":0, \"RESPONSIVE_MAINTAINER_SCORE\":0, \"LICENSE_SCORE\":0}\n" {
         t.Errorf("Expected %s, got %s", "this is value: test", out)
     }
 

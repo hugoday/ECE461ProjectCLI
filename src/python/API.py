@@ -2,9 +2,10 @@ import requests
 from dateutil import parser
 import datetime
 import sys
+import os
 
 # Used for authentication
-headers = {"Authorization":  "token [TOKEN] "}
+headers = {"Authorization":  "token " + os.getenv("GITHUB_TOKEN")}
 
 # Call this function in Go, pass in a URL, returns a score for responsiveness
 def graphQLMetric(url):

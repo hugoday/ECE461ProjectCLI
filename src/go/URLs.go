@@ -52,8 +52,8 @@ func newRepo(url string) *repo {
 	cloneRepo(url)
 
 	//r.busFactor = getBusFactor(r.URL)
-	r.correctness = getCorrectness(r.URL)
-	// r.licenseCompatibility = getLicenseCompatibility(r.URL)
+	// r.correctness = getCorrectness(r.URL)
+	r.licenseCompatibility = getLicenseCompatibility(r.URL)
 	//r.rampUpTime = getRampUpTime(r.URL)
 	// r.responsiveness = getResponsiveness(r.URL)
 	//r.totalScore = r.busFactor + int(r.correctness*20) + r.licenseCompatibility + r.rampUpTime + r.responsiveness
@@ -67,7 +67,6 @@ func newRepo(url string) *repo {
 
 // * START OF RESPONSIVENESS * \\
 
-// NEED TO IMPLEMENT GITHUB TOKEN CALLING
 // Function to get responsiveness metric score
 func getResponsiveness(url string) float64 {
 	var command string
@@ -186,7 +185,7 @@ func runRestApi(url string) {
 
 func teardownRestApi() {
 	setup := "import sys; sys.path.append('../'); from src.python import rest_api;"
-	cmd := exec.Command("python", "-c", setup+"rest_api.deleteIssues()")
+	cmd := exec.Command("python3", "-c", setup+"rest_api.deleteIssues()")
 	_, err := cmd.Output()
 	if err != nil {
 		fmt.Println(err)
@@ -237,10 +236,9 @@ func searchForLicenses(folder string) bool {
 		if found {
 			return nil
 		}
-		if info.IsDir() { //skip .git, etc
-			if info.Name()[0] == '.' {
-				return filepath.SkipDir
-			}
+		if info.IsDir() && len(info.Name()) > 0 && info.Name()[0] == '.' {
+			return filepath.SkipDir
+		// }
 		} else {
 			// fmt.Println("Searching for license in: " + path)
 			found = checkFileForLicense(path)
