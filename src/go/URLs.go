@@ -108,12 +108,15 @@ func getRampUpTime(url string) float64 {
 	command = "python3 src/python/RampUpTime.py"
 	r := subprocess.New(command, subprocess.Shell)
 	r.Exec()
-	dat, err := os.ReadFile("output.txt")
+	dat, err := os.ReadFile("RU_Result.txt")
 	if err != nil {
 		fmt.Println("File open failed")
 	}
+	command = "rm RU_Result.txt"
+	r = subprocess.New(command, subprocess.Shell)
+	r.Exec()
 	f1, err := strconv.ParseFloat(string(dat), 32)
-	fmt.Println(f1)
+	// fmt.Println(f1)
 	if err != nil {
 		fmt.Println("Conversion of string to float didn't work.")
 	}
