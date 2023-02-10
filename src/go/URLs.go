@@ -60,9 +60,9 @@ func newRepo(url string) *repo {
 	r.busFactor = getBusFactor(r.repoName)
 
 
-	// r.correctness = getCorrectness(r.URL)
+	// //r.correctness = getCorrectness(r.URL)
 	r.licenseCompatibility = getLicenseCompatibility(r.URL)
-	//r.rampUpTime = getRampUpTime(r.URL)
+	r.rampUpTime = getRampUpTime(r.URL)
 	// r.responsiveness = getResponsiveness(r.URL)
 	//r.totalScore = r.busFactor + int(r.correctness*20) + r.licenseCompatibility + r.rampUpTime + r.responsiveness
 
@@ -112,9 +112,24 @@ func removeScores() {
 // * START OF RAMP-UP TIME * \\
 
 // Function to get ramp-up time metric scor
-func getRampUpTime(url string) int {
-
-	return -1
+func getRampUpTime(url string) float64 {
+	var command string
+	command = "python3 src/python/RampUpTime.py"
+	r := subprocess.New(command, subprocess.Shell)
+	r.Exec()
+	dat, err := os.ReadFile("RU_Result.txt")
+	if err != nil {
+		fmt.Println("File open failed")
+	}
+	command = "rm RU_Result.txt"
+	r = subprocess.New(command, subprocess.Shell)
+	r.Exec()
+	f1, err := strconv.ParseFloat(string(dat), 32)
+	// fmt.Println(f1)
+	if err != nil {
+		fmt.Println("Conversion of string to float didn't work.")
+	}
+	return f1
 
 }
 
@@ -308,7 +323,6 @@ func getLicenseCompatibility(url string) float64 {
 
 	foundLicense := searchForLicenses("./src/repos/rnd/")
 
-
 	if foundLicense {
 		fmt.Println("[LICENSE FOUND]")
 		return 1
@@ -367,10 +381,8 @@ func checkFileForLicense(path string) bool {
 // * START OF REPO CLONING/REMOVING  * \\
 
 func cloneRepo(url string) string {
-	fmt.Println("cloning repo")
-	s := subprocess.New("git clone " + url, subprocess.Shell)
-	//fmt.Println("Cloning Repo")
-	//s := subprocess.New("git clone " + url + " src/repos/rnd", subprocess.Shell)
+	fmt.Println("Cloning Repo")
+	s := subprocess.New("git clone "+url+" src/repos/rnd", subprocess.Shell)
 	if err := s.Exec(); err != nil {
 		log.Fatal(err)
 		fmt.Println(err)
