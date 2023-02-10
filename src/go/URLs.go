@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	// "reflect"
 
 	"github.com/estebangarcia21/subprocess"
 	// "subprocess"
@@ -31,6 +32,7 @@ import (
 // where we will pass urls by accessing the repo's url
 type repo struct {
 	URL                  string
+	repoName			 string
 	responsiveness       float64
 	correctness          float64
 	rampUpTime           float64
@@ -42,7 +44,10 @@ type repo struct {
 
 // this is a function to utilize createing a new repo and initializing each metric within
 func newRepo(url string) *repo {
+
+
 	r := repo{URL: url}
+	r.repoName =(cloneRepo(url))
 	r.busFactor = -1
 	r.correctness = -1
 	r.licenseCompatibility = -1
@@ -51,13 +56,18 @@ func newRepo(url string) *repo {
 
 	cloneRepo(url)
 
-	//r.busFactor = getBusFactor(r.URL)
+	// make_shortlog_file("ECE461ProjectCLI")
+	r.busFactor = getBusFactor(r.repoName)
+
+
 	// r.correctness = getCorrectness(r.URL)
 	r.licenseCompatibility = getLicenseCompatibility(r.URL)
 	//r.rampUpTime = getRampUpTime(r.URL)
 	// r.responsiveness = getResponsiveness(r.URL)
 	//r.totalScore = r.busFactor + int(r.correctness*20) + r.licenseCompatibility + r.rampUpTime + r.responsiveness
 
+	// s := subprocess.New("rmdir --ignore-fail-on-non-empty " + r.repoName, subprocess.Shell)
+	// s.Exec()
 	clearRepoFolder()
 
 	return &r
@@ -113,9 +123,87 @@ func getRampUpTime(url string) int {
 // * START OF BUS FACTOR * \\
 
 // Function to get bus factor metric score
-func getBusFactor(url string) int {
+func getBusFactor(url string) float64 {
+	make_shortlog_file(url)
+	regex, _ := regexp.Compile("[0-9]+") //Regex for parsing count into only integer
 
-	return -1
+	short_log_raw_data, err1 := os.ReadFile(url + "/shortlog.txt")
+	if err1 != nil {
+		fmt.Println("Did not find shortlog file")
+		log.Fatal(err1)
+	}
+
+	arr := strings.Split(string(short_log_raw_data), "\n") // parsing shortlog file by lines
+	
+	len_log := len(arr) - 1
+	
+	if len_log < 1{
+		fmt.Println("No committers for repo " + url)
+		delete_shortlog_file(url)
+		return 0
+	}
+	
+	var num_bus_committers int
+	if len_log < 100{
+		num_bus_committers = 1
+	}else{
+		num_bus_committers = len_log / 100
+	}
+
+	total := 0
+	total_bus_guys := 0
+	var num string
+
+	fmt.Println(len_log)
+
+	for i := 0; i < len_log; i++ {
+		num = regex.FindString(arr[i])
+		num_int, err2 := strconv.Atoi(num)
+		if err2 != nil{
+			fmt.Println("Conversion from string to int didn't work (bus factor calc)")
+			log.Fatal(err2)
+		}
+		total += num_int
+		if i < num_bus_committers{
+			total_bus_guys += num_int
+		}
+	}
+	delete_shortlog_file(url)
+	metric := (float64(total) - float64(total_bus_guys)) / float64(total)
+	fmt.Println(metric)
+	return metric
+}
+
+
+func make_shortlog_file(url string){
+	os.Chdir(url)
+
+	cmd := exec.Command("git","shortlog","HEAD","-se", "-n")
+	cwd, _ := os.Getwd()
+
+	fmt.Println("dir is " + cwd)
+
+	out,err := cmd.Output()
+
+	if err != nil{
+		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
+		log.Fatal(err)	
+	}
+
+	os.WriteFile("shortlog.txt", out, 0644)
+
+	os.Chdir("../")
+	
+	cwd, _ = os.Getwd()
+	fmt.Println("dir is " + cwd)
+
+}
+
+func delete_shortlog_file(url string){
+	var command string
+	command = "rm -f " + url + "/shortlog.txt"
+	s := subprocess.New(command, subprocess.Shell)
+	s.Exec()
 
 }
 
@@ -279,14 +367,25 @@ func checkFileForLicense(path string) bool {
 // * START OF REPO CLONING/REMOVING  * \\
 
 func cloneRepo(url string) string {
-	fmt.Println("Cloning Repo")
-	s := subprocess.New("git clone " + url + " src/repos/rnd", subprocess.Shell)
+	fmt.Println("cloning repo")
+	s := subprocess.New("git clone " + url, subprocess.Shell)
+	//fmt.Println("Cloning Repo")
+	//s := subprocess.New("git clone " + url + " src/repos/rnd", subprocess.Shell)
 	if err := s.Exec(); err != nil {
 		log.Fatal(err)
 		fmt.Println(err)
-		return ("ERROR")
+		return ("ERROR CLONING")
 	}
-	return string("SUCCESS")
+	index := strings.Index(url, ".com/")
+	if index == -1 {
+		fmt.Println("No '.com/' found in the string")
+		return "FAILURE"
+	}
+	
+	url = url[index+5:]
+	r, _ := regexp.Compile("/")
+	a := r.Split(url, 2)
+	return a[1]
 }
 
 func clearRepoFolder() {
