@@ -340,29 +340,34 @@ func addRepo(head *repo, curr *repo, temp *repo) *repo {
 
 // * START OF MAIN * \\
 
-func main() {
-	// Makes sure repository folder is clear
-	clearRepoFolder()
+// func main() {
+// 	// Makes sure repository folder is clear
+// 	clearRepoFolder()
 
-	// Opens URL file and creates a scanner
-	file, _ := os.Open(os.Args[1])
-	scanner := bufio.NewScanner(file)
+// 	// Opens URL file and creates a scanner
+// 	file, _ := os.Open(os.Args[1])
+// 	scanner := bufio.NewScanner(file)
 
-	// Create head and temporary repo nodes
-	var head *repo
-	var hold *repo
-	head = &repo{URL: "HEAD"}
+// 	// Create head and temporary repo nodes
+// 	var head *repo
+// 	var hold *repo
+// 	head = &repo{URL: "HEAD"}
 
-	for scanner.Scan() {
-		//Create new repositories with current URL scanned
-		hold = newRepo(scanner.Text())
-		head = addRepo(head, head.next, hold)
-		// Add New Repo to linked list
-		// NEEDS TO BE REPLACED WITH SORTING METHOD
-	}
+// 	for scanner.Scan() {
+// 		//Create new repositories with current URL scanned
+// 		hold = newRepo(scanner.Text())
+// 		head = addRepo(head, head.next, hold)
+// 		// Add New Repo to linked list
+// 		// NEEDS TO BE REPLACED WITH SORTING METHOD
+// 	}
 
-	//
-	printRepo(head.next)
-}
+// 	//
+// 	printRepo(head.next)
+// }
 
 // * END OF MAIN * \\
+
+
+func TestFunction() {
+	fmt.Println("done")
+}
