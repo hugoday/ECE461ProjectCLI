@@ -202,7 +202,7 @@ func make_shortlog_file(url string){
 
 	if err != nil{
 		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
-		log.Fatal(err)	
+		// log.Fatal(err)	
 	}
 
 	os.WriteFile("shortlog.txt", out, 0644)
@@ -239,7 +239,7 @@ func getCorrectness(url string) float64 {
 	data_closed, err1 := os.ReadFile("./src/issues/closed.txt")
 	if err1 != nil {
 		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
-		log.Fatal(err1)
+		// log.Fatal(err1)
 		return 0
 	}
 	closed_count := regex.FindString(string(data_closed))
@@ -249,7 +249,7 @@ func getCorrectness(url string) float64 {
 	data_open, err := os.ReadFile("./src/issues/open.txt")
 	if err != nil {
 		fmt.Println("Did not find open issues file from api, invalid url: " + url)
-		log.Fatal(err)
+		// log.Fatal(err)
 		return 0
 	}
 	open_count := regex.FindString(string(data_open))
@@ -297,8 +297,8 @@ func teardownRestApi() {
 
 func calc_score(s1 string, s2 string) float64 {
 
-	fmt.Println(s1)
-	fmt.Println(s2)
+	// fmt.Println(s1)
+	// fmt.Println(s2)
 	f1, err := strconv.ParseFloat(s1, 32)
 	if err != nil {
 		fmt.Println("Conversion of s1 to string float didn't work.")
@@ -319,7 +319,7 @@ func calc_score(s1 string, s2 string) float64 {
 
 // Function to get license compatibility metric score
 func getLicenseCompatibility(url string) float64 {
-	fmt.Println("Checking for license... ")
+	// fmt.Println("Checking for license... ")
 
 	foundLicense := searchForLicenses("./src/repos/rnd/")
 
@@ -338,9 +338,8 @@ func searchForLicenses(folder string) bool {
 		if found {
 			return nil
 		}
-		if info.IsDir() && len(info.Name()) > 0 && info.Name()[0] == '.' {
+		if info != nil && len(info.Name()) > 0 && info.Name()[0] == '.' {
 			return filepath.SkipDir
-		// }
 		} else {
 			// fmt.Println("Searching for license in: " + path)
 			found = checkFileForLicense(path)
@@ -446,37 +445,3 @@ func addRepo(head *repo, curr *repo, temp *repo) *repo {
 }
 
 // * END OF SORTING * \\
-
-// * START OF MAIN * \\
-
-// func main() {
-// 	// Makes sure repository folder is clear
-// 	clearRepoFolder()
-
-// 	// Opens URL file and creates a scanner
-// 	file, _ := os.Open(os.Args[1])
-// 	scanner := bufio.NewScanner(file)
-
-// 	// Create head and temporary repo nodes
-// 	var head *repo
-// 	var hold *repo
-// 	head = &repo{URL: "HEAD"}
-
-// 	for scanner.Scan() {
-// 		//Create new repositories with current URL scanned
-// 		hold = newRepo(scanner.Text())
-// 		head = addRepo(head, head.next, hold)
-// 		// Add New Repo to linked list
-// 		// NEEDS TO BE REPLACED WITH SORTING METHOD
-// 	}
-
-// 	//
-// 	printRepo(head.next)
-// }
-
-// * END OF MAIN * \\
-
-
-func TestFunction() {
-	fmt.Println("done")
-}

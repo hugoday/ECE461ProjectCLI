@@ -25,7 +25,6 @@ import (
 func main() {
 	// Makes sure repository folder is clear
 	clearRepoFolder()
-	TestFunction()
 
 	// Opens URL file and creates a scanner
 	file, _ := os.Open(os.Args[1])

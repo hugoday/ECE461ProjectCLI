@@ -7,18 +7,6 @@ import (
 	"io/ioutil"
 )
 
-
-func TestTestFunction(t *testing.T) {
-
-	// name := "Gladys"
-    // want := regexp.MustCompile(`\b`+name+`\b`)
-    TestFunction()
-    // if err != nil {
-    //     t.Fatalf(`got err %v`, err)
-    // }
-
-}
-
 // * START OF RESPONSIVENESS * \\
 
 // NEED TO IMPLEMENT GITHUB TOKEN CALLING
@@ -58,19 +46,75 @@ func TestGetBusFactor(t *testing.T) {
 
 // Function to get correctness metric score
 func TestGetCorrectness(t *testing.T) {
-	
+	rescueStdout := os.Stdout
+    read, w, _ := os.Pipe()
+    os.Stdout = w
+
+	// var r repo
+	// r.URL = "testUrl"
+	// r.netScore = 7.4
+	getCorrectness("not/a/url")
+
+    w.Close()
+    out, _ := ioutil.ReadAll(read)
+    os.Stdout = rescueStdout
+	// t.Errorf(string(out))
+	// t.Errorf("hi")
+	// t.Fail()
+    if string(out) != "" {
+        t.Errorf("Expected %s, got %s", "asdf", out)
+    }
 }
 
 func TestRunRestApi(t *testing.T) {
+	rescueStdout := os.Stdout
+    read, w, _ := os.Pipe()
+    os.Stdout = w
 
+	// var r repo
+	// r.URL = "testUrl"
+	// r.netScore = 7.4
+	runRestApi("not/a/url")
+
+    w.Close()
+    out, _ := ioutil.ReadAll(read)
+    os.Stdout = rescueStdout
+	// t.Errorf(string(out))
+	// t.Errorf("hi")
+	// t.Fail()
+    if string(out) != "No '.com/' found in the string\n" {
+        t.Errorf("Expected %s, got %s", "No '.com/' found in the string", out)
+    }
 }
 
 func TestTeardownRestApi(t *testing.T) {
-	
+	rescueStdout := os.Stdout
+    read, w, _ := os.Pipe()
+    os.Stdout = w
+
+	// var r repo
+	// r.URL = "testUrl"
+	// r.netScore = 7.4
+	teardownRestApi()
+
+    w.Close()
+    out, _ := ioutil.ReadAll(read)
+    os.Stdout = rescueStdout
+	// t.Errorf(string(out))
+	// t.Errorf("hi")
+	// t.Fail()
+    if string(out) != "exit status 1\n" {
+        t.Errorf("Expected %s, got %s", "exit status 1", out)
+    }
 }
 
 func TestCalc_score(t *testing.T) {
 
+	out := calc_score("2", "2")
+
+	if out != 0.5 {
+        t.Errorf("Expected %s, got %f", "0.5", out)
+    }
 }
 
 // * END OF CORRECTNESS * \\
@@ -79,24 +123,24 @@ func TestCalc_score(t *testing.T) {
 
 // Function to get license compatibility metric score
 func TestGetLicenseCompatibility(t *testing.T) {
-	// rescueStdout := os.Stdout
-    // read, w, _ := os.Pipe()
-    // os.Stdout = w
+	rescueStdout := os.Stdout
+    read, w, _ := os.Pipe()
+    os.Stdout = w
 
-	// // var r repo
-	// // r.URL = "testUrl"
-	// // r.netScore = 7.4
-	// getLicenseCompatibility("testURL")
+	// var r repo
+	// r.URL = "testUrl"
+	// r.netScore = 7.4
+	getLicenseCompatibility("testURL")
 
-    // w.Close()
-    // out, _ := ioutil.ReadAll(read)
-    // os.Stdout = rescueStdout
-	// // t.Errorf(string(out))
-	// // t.Errorf("hi")
-	// // t.Fail()
-    // if string(out) != "[LICENSE NOT FOUND]\n" {
-    //     t.Errorf("Expected %s, got %s", "this is value: test", out)
-    // }
+    w.Close()
+    out, _ := ioutil.ReadAll(read)
+    os.Stdout = rescueStdout
+	// t.Errorf(string(out))
+	// t.Errorf("hi")
+	// t.Fail()
+    if string(out) != "[LICENSE NOT FOUND]\n" {
+        t.Errorf("Expected %s, got %s", "this is value: test", out)
+    }
 }
 
 func TestSearchForLicenses(t *testing.T) {
@@ -107,7 +151,7 @@ func TestSearchForLicenses(t *testing.T) {
 	// var r repo
 	// r.URL = "testUrl"
 	// r.netScore = 7.4
-	// searchForLicenses("./src")
+	searchForLicenses("./src")
 
     w.Close()
     out, _ := ioutil.ReadAll(read)
@@ -115,8 +159,8 @@ func TestSearchForLicenses(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "asdf\n" {
-        t.Errorf("Expected %s, got %s", "asdf", out)
+    if string(out) != "Coudln't open path open ./src: no such file or directory\n" {
+        t.Errorf("Expected %s, got %s", "Coudln't open path open ./src: no such file or directory", out)
     }
 }
 
