@@ -54,15 +54,13 @@ func newRepo(url string) *repo {
 	r.rampUpTime = -1
 	r.netScore = -1
 
-	cloneRepo(url)
-
-	// make_shortlog_file("ECE461ProjectCLI")
+	make_shortlog_file("ECE461ProjectCLI")
 	r.busFactor = getBusFactor(r.repoName)
 
 
-	// //r.correctness = getCorrectness(r.URL)
-	r.licenseCompatibility = getLicenseCompatibility(r.URL)
-	r.rampUpTime = getRampUpTime(r.URL)
+	// r.correctness = getCorrectness(r.URL)
+	// r.licenseCompatibility = getLicenseCompatibility(r.URL)
+	// r.rampUpTime = getRampUpTime(r.URL)
 	// r.responsiveness = getResponsiveness(r.URL)
 	//r.totalScore = r.busFactor + int(r.correctness*20) + r.licenseCompatibility + r.rampUpTime + r.responsiveness
 
@@ -228,7 +226,7 @@ func delete_shortlog_file(url string){
 
 // Function to get correctness metric score
 func getCorrectness(url string) float64 {
-	fmt.Println("Getting correctness...")
+	// fmt.Println("Getting correctness...")
 
 	runRestApi(url)
 
@@ -237,25 +235,20 @@ func getCorrectness(url string) float64 {
 
 	//closed issues
 	data_closed, err1 := os.ReadFile("./src/issues/closed.txt")
-	if err1 != nil {
-		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
-		// log.Fatal(err1)
-		return 0
-	}
 	closed_count := regex.FindString(string(data_closed))
 	closed_count = num_regex.FindString(closed_count)
-
+	
 	//open issues
 	data_open, err := os.ReadFile("./src/issues/open.txt")
-	if err != nil {
-		fmt.Println("Did not find open issues file from api, invalid url: " + url)
+	open_count := regex.FindString(string(data_open))
+	open_count = num_regex.FindString(open_count)
+	if err != nil || err1 != nil{
+		fmt.Println("Did not find issues file from api, invalid url: " + url)
 		// log.Fatal(err)
 		return 0
 	}
-	open_count := regex.FindString(string(data_open))
-	open_count = num_regex.FindString(open_count)
-	fmt.Println("Open: " + open_count + "\nClosed: " + closed_count)
-
+	// fmt.Println("Open: " + open_count + "\nClosed: " + closed_count)
+	
 	score := calc_score(open_count, closed_count)
 	if math.IsNaN(score) {
 		score = 0
@@ -263,27 +256,25 @@ func getCorrectness(url string) float64 {
 	// fmt.Println(score)
 
 	teardownRestApi()
-	fmt.Println("[CORRECTNESS DONE] ", score)
-	fmt.Println()
+
 	return score
 }
 
-func runRestApi(url string) {
+func runRestApi(url string) int {
 
 	index := strings.Index(url, ".com/")
 	if index == -1 {
-		fmt.Println("No '.com/' found in the string")
-		return
+		// fmt.Println("No '.com/' found in the string")
+		return 1
 	}
 	url = url[index+5:]
 	
 	token := os.Getenv("GITHUB_TOKEN")
-	fmt.Println(token,url)
 	command := "python3 -c 'import os; os.remove(\"src/issues/closed.txt\") if os.path.exists(\"src/issues/closed.txt\") else \"continue\"; os.remove(\"src/issues/open.txt\") if os.path.exists(\"src/issues/open.txt\") else \"continue\"; os.system(\"curl -i -H \\\"Authorization: token "+token+"\\\" https://api.github.com/search/issues?q=repo:"+url+"+type:issue+state:closed >> src/issues/closed.txt\"); os.system(\"curl -i -H \\\"Authorization: token "+token+"\\\" https://api.github.com/search/issues?q=repo:"+url+"+type:issue+state:open >> src/issues/open.txt\");'"
 
 	r := subprocess.New(command, subprocess.Shell)
 	r.Exec()
-	return
+	return 0
 }
 
 func teardownRestApi() {
@@ -338,10 +329,14 @@ func searchForLicenses(folder string) bool {
 		if found {
 			return nil
 		}
-		if info != nil && len(info.Name()) > 0 && info.Name()[0] == '.' {
-			return filepath.SkipDir
+		if info == nil {
+			return nil
+		}
+		if info.IsDir() {
+			if len(info.Name()) > 0 && info.Name()[0] == '.' {
+				return filepath.SkipDir
+			}
 		} else {
-			// fmt.Println("Searching for license in: " + path)
 			found = checkFileForLicense(path)
 		}
 		return nil
@@ -358,7 +353,7 @@ func checkFileForLicense(path string) bool {
 	license := "LGPL-2.1"
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Print("Coudln't open path ")
+		// fmt.Print("Coudln't open path ")
 		fmt.Println(err)
 		return false
 	}

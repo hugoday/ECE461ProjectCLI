@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "fmt"
+	"fmt"
 	"os"
 	"testing"
 	"io/ioutil"
@@ -9,14 +9,18 @@ import (
 
 // * START OF RESPONSIVENESS * \\
 
-// NEED TO IMPLEMENT GITHUB TOKEN CALLING
 // Function to get responsiveness metric score
 func TestGetResponsiveness(t *testing.T) {
+
+	testUrl := "github.com/hugoday/resume"
+	// cloneRepo(testUrl)
+	responsiveness := getResponsiveness(testUrl)
+	fmt.Println(responsiveness)
 
 }
 
 func TestRemoveScores(t *testing.T) {
-
+	removeScores()
 }
 
 // * END OF RESPONSIVENESS * \\
@@ -26,7 +30,7 @@ func TestRemoveScores(t *testing.T) {
 // Function to get ramp-up time metric scor
 func TestGetRampUpTime(t *testing.T) {
 
-	
+	getRampUpTime("github.com/hugoday/resume")
 }
 
 // * END OF RAMP-UP TIME * \\
@@ -36,7 +40,7 @@ func TestGetRampUpTime(t *testing.T) {
 // Function to get bus factor metric score
 func TestGetBusFactor(t *testing.T) {
 
-	
+	// getBusFactor("github.com/hugoday/resume")
 
 }
 
@@ -61,8 +65,8 @@ func TestGetCorrectness(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "" {
-        t.Errorf("Expected %s, got %s", "asdf", out)
+    if string(out) != "Did not find issues file from api, invalid url: not/a/url\n" {
+        t.Errorf("Expected %s, got %s", "Did not find issues file from api, invalid url: not/a/url", out)
     }
 }
 
@@ -74,7 +78,7 @@ func TestRunRestApi(t *testing.T) {
 	// var r repo
 	// r.URL = "testUrl"
 	// r.netScore = 7.4
-	runRestApi("not/a/url")
+	exitStatus := runRestApi("not/a/url")
 
     w.Close()
     out, _ := ioutil.ReadAll(read)
@@ -82,8 +86,8 @@ func TestRunRestApi(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "No '.com/' found in the string\n" {
-        t.Errorf("Expected %s, got %s", "No '.com/' found in the string", out)
+    if exitStatus != 1 {
+        t.Errorf("Expected %s, got %s", "exit status 1", out)
     }
 }
 
@@ -143,6 +147,27 @@ func TestGetLicenseCompatibility(t *testing.T) {
     }
 }
 
+func TestGetLicenseCompatibility2(t *testing.T) {
+	rescueStdout := os.Stdout
+    read, w, _ := os.Pipe()
+    os.Stdout = w
+
+	// var r repo
+	// r.URL = "testUrl"
+	// r.netScore = 7.4
+	getLicenseCompatibility("https://github.com/hugoday/resume")
+
+    w.Close()
+    out, _ := ioutil.ReadAll(read)
+    os.Stdout = rescueStdout
+	// t.Errorf(string(out))
+	// t.Errorf("hi")
+	// t.Fail()
+    if string(out) != "[LICENSE NOT FOUND]\n" {
+        t.Errorf("Expected %s, got %s", "this is value: test", out)
+    }
+}
+
 func TestSearchForLicenses(t *testing.T) {
 	rescueStdout := os.Stdout
     read, w, _ := os.Pipe()
@@ -159,8 +184,8 @@ func TestSearchForLicenses(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "Coudln't open path open ./src: no such file or directory\n" {
-        t.Errorf("Expected %s, got %s", "Coudln't open path open ./src: no such file or directory", out)
+    if string(out) != "" {
+        t.Errorf("Expected %s, got %s", "nothing", out)
     }
 }
 
@@ -180,8 +205,8 @@ func TestCheckFileForLicense1(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "Coudln't open path open ./src/does/not/exist: no such file or directory\n" {
-        t.Errorf("Expected %s, got %s", "Coudln't open path open ./src/does/not/exist: no such file or directory", out)
+    if string(out) != "open ./src/does/not/exist: no such file or directory\n" {
+        t.Errorf("Expected %s, got %s", "open ./src/does/not/exist: no such file or directory", out)
     }
 }
 
@@ -211,11 +236,11 @@ func TestCheckFileForLicense2(t *testing.T) {
 // * START OF REPO CLONING/REMOVING  * \\
 
 func TestCloneRepo(t *testing.T) {
-	
+	cloneRepo("not/a/repo")
 }
 
 func TestClearRepoFolder(t *testing.T) {
-	
+	clearRepoFolder()
 }
 
 // * END OF REPO CLONING/REMOVING  * \\
@@ -223,7 +248,14 @@ func TestClearRepoFolder(t *testing.T) {
 // * START OF STDOUT * \\
 
 func TestPrintRepo(t *testing.T) {
-	
+	r := repo{URL: "testRepo"}
+	r.repoName = "testRepo"
+	r.busFactor = -1
+	r.correctness = -1
+	r.licenseCompatibility = -1
+	r.rampUpTime = -1
+	r.netScore = -1
+	printRepo(&r)
 }
 
 func TestRepoOUT(t *testing.T) {
