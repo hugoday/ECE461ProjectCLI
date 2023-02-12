@@ -1,0 +1,4 @@
+https://github.com/hugoday/ECE461ProjectCLI
+https://github.com/sedcli/sedcli
+https://github.com/cloudinary/cloudinary_npm
+https://github.com/nullivex/nodist
