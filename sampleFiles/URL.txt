@@ -2,10 +2,3 @@ https://github.com/hugoday/ECE461ProjectCLI
 https://github.com/sedcli/sedcli
 https://github.com/cloudinary/cloudinary_npm
 https://github.com/nullivex/nodist
-https://github.com/lodash/lodash
-https://github.com/torvalds/linux
-https://github.com/raspberrypi/linux
-https://github.com/AlDanial/cloc
-https://github.com/esp8266/Arduino
-https://github.com/bpembert/ECE39595J
-https://github.com/doomemacs/themes
