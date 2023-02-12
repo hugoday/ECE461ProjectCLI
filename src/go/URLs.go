@@ -439,7 +439,7 @@ func cloneRepo(url string) string {
 	s := subprocess.New("git clone --quiet "+url+" src/metric_scores/repos", subprocess.Shell)
 	if err := s.Exec(); err != nil {
 		log.Fatal(err)
-		DebugLogger.Println("Error cloning repo %s: %s", url, err)
+		DebugLogger.Printf("Error cloning repo %s: %s\n", url, err)
 		return ("ERROR CLONING")
 	}
 	index := strings.Index(url, ".com/")

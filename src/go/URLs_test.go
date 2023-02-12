@@ -5,12 +5,17 @@ import (
 	"os"
 	"testing"
 	"io/ioutil"
+	"log"
 )
+
+
 
 // * START OF RESPONSIVENESS * \\
 
 // Function to get responsiveness metric score
 func TestGetResponsiveness(t *testing.T) {
+	DebugLogger = log.New(new(NoLog), "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
+	InfoLogger = log.New(new(NoLog), "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	testUrl := "github.com/hugoday/resume"
 	// cloneRepo(testUrl)
