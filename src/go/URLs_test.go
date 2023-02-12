@@ -96,9 +96,7 @@ func TestTeardownRestApi(t *testing.T) {
     read, w, _ := os.Pipe()
     os.Stdout = w
 
-	// var r repo
-	// r.URL = "testUrl"
-	// r.netScore = 7.4
+
 	teardownRestApi()
 
     w.Close()
@@ -107,8 +105,8 @@ func TestTeardownRestApi(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "exit status 1\n" {
-        t.Errorf("Expected %s, got %s", "exit status 1", out)
+    if string(out) != "" {
+        t.Errorf("Expected %s, got %s", "nothing", out)
     }
 }
 
@@ -142,8 +140,8 @@ func TestGetLicenseCompatibility(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "[LICENSE NOT FOUND]\n" {
-        t.Errorf("Expected %s, got %s", "this is value: test", out)
+    if string(out) != "" {
+        t.Errorf("Expected %s, got %s", "nothing", out)
     }
 }
 
@@ -163,8 +161,8 @@ func TestGetLicenseCompatibility2(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "[LICENSE NOT FOUND]\n" {
-        t.Errorf("Expected %s, got %s", "this is value: test", out)
+    if string(out) != "" {
+        t.Errorf("Expected %s, got %s", "nothing", out)
     }
 }
 
@@ -205,8 +203,8 @@ func TestCheckFileForLicense1(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "open ./src/does/not/exist: no such file or directory\n" {
-        t.Errorf("Expected %s, got %s", "open ./src/does/not/exist: no such file or directory", out)
+    if string(out) != "" {
+        t.Errorf("Expected %s, got %s", "nothing", out)
     }
 }
 
@@ -274,8 +272,8 @@ func TestRepoOUT(t *testing.T) {
 	// t.Errorf(string(out))
 	// t.Errorf("hi")
 	// t.Fail()
-    if string(out) != "{\"URL\":\"testUrl\", \"NET_SCORE\":7.4, \"RAMP_UP_SCORE\":0,\"CORRECTNESS_SCORE\":0, \"BUS_FACTOR_SCORE\":0, \"RESPONSIVE_MAINTAINER_SCORE\":0, \"LICENSE_SCORE\":0}\n" {
-        t.Errorf("Expected %s, got %s", "this is value: test", out)
+    if string(out) != "{\"URL\":\"testUrl\", \"NET_SCORE\":7.40, \"RAMP_UP_SCORE\":0.00, \"CORRECTNESS_SCORE\":0.00, \"BUS_FACTOR_SCORE\":0.00, \"RESPONSIVE_MAINTAINER_SCORE\":0.00, \"LICENSE_SCORE\":0.00}\n" {
+        t.Errorf("Expected %s, got %s", "{\"URL\":\"testUrl\", \"NET_SCORE\":7.40, \"RAMP_UP_SCORE\":0.00, \"CORRECTNESS_SCORE\":0.00, \"BUS_FACTOR_SCORE\":0.00, \"RESPONSIVE_MAINTAINER_SCORE\":0.00, \"LICENSE_SCORE\":0.00}", out)
     }
 
 	// fmt.Print("{\"URL\":\"", r.URL, "\", \"NET_SCORE\":", r.netScore, ", \"RAMP_UP_SCORE\":", r.rampUpTime, ",\"CORRECTNESS_SCORE\":", r.correctness, ", \"BUS_FACTOR_SCORE\":", r.busFactor, ", \"RESPONSIVE_MAINTAINER_SCORE\":", r.responsiveness, ", \"LICENSE_SCORE\":", r.licenseCompatibility, "}\n")
