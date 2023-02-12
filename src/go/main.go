@@ -16,14 +16,18 @@ var (
 
 
 func main() {
+	doLogging := true
 	logFileName := os.Getenv("LOG_FILE")
 	logFile, err := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
     if err != nil {
-        log.Fatal(err)
+        doLogging = false
     }
 
-    InfoLogger = log.New(logFile, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-    DebugLogger = log.New(logFile, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
+	if doLogging {
+		InfoLogger = log.New(logFile, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+		DebugLogger = log.New(logFile, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
+
+	}
 
 	// Makes sure repository folder is clear
 	clearRepoFolder()
