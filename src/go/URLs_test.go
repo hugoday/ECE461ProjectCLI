@@ -247,7 +247,6 @@ func TestClearRepoFolder(t *testing.T) {
 
 func TestPrintRepo(t *testing.T) {
 	r := repo{URL: "testRepo"}
-	r.repoName = "testRepo"
 	r.busFactor = -1
 	r.correctness = -1
 	r.licenseCompatibility = -1
@@ -269,14 +268,10 @@ func TestRepoOUT(t *testing.T) {
     w.Close()
     out, _ := ioutil.ReadAll(read)
     os.Stdout = rescueStdout
-	// t.Errorf(string(out))
-	// t.Errorf("hi")
-	// t.Fail()
-    if string(out) != "{\"URL\":\"testUrl\", \"NET_SCORE\":7.40, \"RAMP_UP_SCORE\":0.00, \"CORRECTNESS_SCORE\":0.00, \"BUS_FACTOR_SCORE\":0.00, \"RESPONSIVE_MAINTAINER_SCORE\":0.00, \"LICENSE_SCORE\":0.00}\n" {
+    if string(out) != "{\"URL\":\"testUrl\", \"NET_SCORE\":7.40, \"RAMP_UP_SCORE\":0.00, \"CORRECTNESS_SCORE\":0.00, \"BUS_FACTOR_SCORE\":0.00, \"RESPONSIVE_MAINTAINER_SCORE\":0.00, \"LICENSE_SCORE\":0.00} \n" {
         t.Errorf("Expected %s, got %s", "{\"URL\":\"testUrl\", \"NET_SCORE\":7.40, \"RAMP_UP_SCORE\":0.00, \"CORRECTNESS_SCORE\":0.00, \"BUS_FACTOR_SCORE\":0.00, \"RESPONSIVE_MAINTAINER_SCORE\":0.00, \"LICENSE_SCORE\":0.00}", out)
     }
 
-	// fmt.Print("{\"URL\":\"", r.URL, "\", \"NET_SCORE\":", r.netScore, ", \"RAMP_UP_SCORE\":", r.rampUpTime, ",\"CORRECTNESS_SCORE\":", r.correctness, ", \"BUS_FACTOR_SCORE\":", r.busFactor, ", \"RESPONSIVE_MAINTAINER_SCORE\":", r.responsiveness, ", \"LICENSE_SCORE\":", r.licenseCompatibility, "}\n")
 }
 
 // * END OF STDOUT * \\
