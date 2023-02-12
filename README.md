@@ -22,4 +22,5 @@ We are required to clone the repository to calculate at least one metric - we ha
 We are required to check if the repository is compatbile with LGPLv2.1 license - we have done this (License Compatibility - checks if this is the license the repository uses).
 We are required to send our final output ranked list to stdout - we have done this in NDJSON format.
 We are using a GitHub Token in environment variables to run REST and GraphQL APIs.
+We are required to have logging to a file with the specified level of verbosity - we have done this (writes info/debug to a logfile determined by $LOG_LEVEL and $LOG_FILE).
 
