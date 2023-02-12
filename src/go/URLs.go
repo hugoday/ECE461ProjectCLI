@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"log"
+	// "log"
 	// "reflect"
 
 	"github.com/estebangarcia21/subprocess"
@@ -452,7 +452,7 @@ func printRepo(next *repo) {
 }
 
 func repoOUT(r *repo) {
-	fmt.Printf("{\"URL\":\"%s\", \"NET_SCORE\":%.2f, \"RAMP_UP_SCORE\":%.2f, \"CORRECTNESS_SCORE\":%.2f, \"BUS_FACTOR_SCORE\":%.2f, \"RESPONSIVE_MAINTAINER_SCORE\":%.2f, \"LICENSE_SCORE\":%.2f \n", r.URL, r.netScore, r.rampUpTime, r.correctness, r.busFactor, r.responsiveness, r.licenseCompatibility)
+	fmt.Printf("{\"URL\":\"%s\", \"NET_SCORE\":%.2f, \"RAMP_UP_SCORE\":%.2f, \"CORRECTNESS_SCORE\":%.2f, \"BUS_FACTOR_SCORE\":%.2f, \"RESPONSIVE_MAINTAINER_SCORE\":%.2f, \"LICENSE_SCORE\":%.2f}\n", r.URL, r.netScore, r.rampUpTime, r.correctness, r.busFactor, r.responsiveness, r.licenseCompatibility)
 }
 
 // * END OF STDOUT * \\
