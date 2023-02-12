@@ -40,18 +40,19 @@ func newRepo(url string) *repo {
 
 	r := repo{URL: url}
 	r.repoName = (cloneRepo(url))
-	r.busFactor = -1
+	r.busFactor = 0
+	//r.busFactor = getBusFactor(r.repoName)
 	r.correctness = getCorrectness(r.URL)
 	r.licenseCompatibility = getLicenseCompatibility(r.URL)
-	r.rampUpTime = -1
-	r.netScore = -1
+	r.rampUpTime = getRampUpTime(r.URL)
 	r.responsiveness = getResponsiveness(r.URL)
-
+	if (r.busFactor == -1) || (r.correctness == -1) || (r.responsiveness == -1) || (r.rampUpTime == -1) || (r.licenseCompatibility == -1) {
+		r.netScore = -1
+	} else {
+		r.netScore = ((75 * r.licenseCompatibility) + (15 * r.busFactor) + (20 * r.responsiveness) + (20 * r.rampUpTime) + (20 * r.correctness)) / 150
+	}
 	//make_shortlog_file("ECE461ProjectCLI")
 	//r.busFactor = getBusFactor(r.repoName)
-
-	// r.rampUpTime = getRampUpTime(r.URL)
-	//r.totalScore = r.busFactor + int(r.correctness*20) + r.licenseCompatibility + r.rampUpTime + r.responsiveness
 
 	// s := subprocess.New("rmdir --ignore-fail-on-non-empty " + r.repoName, subprocess.Shell)
 	// s.Exec()
@@ -124,18 +125,17 @@ func removeScores() {
 // Function to get ramp-up time metric scor
 func getRampUpTime(url string) float64 {
 	var command string
-	command = "python3 src/python/RampUpTime.py"
+	command = "python3 src/python/rampUpTime.py"
 	r := subprocess.New(command, subprocess.Shell)
 	r.Exec()
-	dat, err := os.ReadFile("RU_Result.txt")
+	dat, err := os.ReadFile("src/metric_scores/rampuptime/RU_Result.txt")
 	if err != nil {
 		fmt.Println("File open failed")
 	}
-	command = "rm RU_Result.txt"
+	command = "rm src/metric_scores/rampuptime/RU_Result.txt"
 	r = subprocess.New(command, subprocess.Shell)
 	r.Exec()
-	f1, err := strconv.ParseFloat(string(dat), 32)
-	// fmt.Println(f1)
+	f1, err := strconv.ParseFloat(string(dat), 64)
 	if err != nil {
 		fmt.Println("Conversion of string to float didn't work.")
 	}
@@ -325,8 +325,7 @@ func calc_score(s1 string, s2 string) float64 {
 	}
 
 	// round(20 * closed issues / (open + closed issues)) / 20 = correctness score [0,1]
-	f3 := 20 * f2 / (f1 + f2)
-	f3 = math.Round(f3) / 20
+	f3 := f2 / (f1 + f2)
 	return f3
 }
 
@@ -451,7 +450,7 @@ func printRepo(next *repo) {
 }
 
 func repoOUT(r *repo) {
-	fmt.Print("{\"URL\":\"", r.URL, "\", \"NET_SCORE\":", r.netScore, ", \"RAMP_UP_SCORE\":", r.rampUpTime, ",\"CORRECTNESS_SCORE\":", r.correctness, ", \"BUS_FACTOR_SCORE\":", r.busFactor, ", \"RESPONSIVE_MAINTAINER_SCORE\":", r.responsiveness, ", \"LICENSE_SCORE\":", r.licenseCompatibility, "}\n")
+	fmt.Printf("{\"URL\":\"%s\", \"NET_SCORE\":%.2f, \"RAMP_UP_SCORE\":%.2f, \"CORRECTNESS_SCORE\":%.2f, \"BUS_FACTOR_SCORE\":%.2f, \"RESPONSIVE_MAINTAINER_SCORE\":%.2f, \"LICENSE_SCORE\":%.2f \n", r.URL, r.netScore, r.rampUpTime, r.correctness, r.busFactor, r.responsiveness, r.licenseCompatibility)
 }
 
 // * END OF STDOUT * \\
