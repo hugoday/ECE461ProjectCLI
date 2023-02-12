@@ -25,7 +25,6 @@ import (
 // where we will pass urls by accessing the repo's url
 type repo struct {
 	URL                  string
-	repoName             string
 	responsiveness       float64
 	correctness          float64
 	rampUpTime           float64
@@ -37,11 +36,9 @@ type repo struct {
 
 // this is a function to utilize createing a new repo and initializing each metric within
 func newRepo(url string) *repo {
-
+	cloneRepo(url)
 	r := repo{URL: url}
-	r.repoName = (cloneRepo(url))
-	r.busFactor = 0
-	//r.busFactor = getBusFactor(r.repoName)
+	r.busFactor = getBusFactor()
 	r.correctness = getCorrectness(r.URL)
 	r.licenseCompatibility = getLicenseCompatibility(r.URL)
 	r.rampUpTime = getRampUpTime(r.URL)
@@ -61,6 +58,7 @@ func newRepo(url string) *repo {
 	return &r
 }
 
+//r.busFactor = getBusFactor(r.repoName)
 // * END OF REPO STRUCTS * \\
 
 // * START OF RESPONSIVENESS * \\
@@ -148,11 +146,11 @@ func getRampUpTime(url string) float64 {
 // * START OF BUS FACTOR * \\
 
 // Function to get bus factor metric score
-func getBusFactor(url string) float64 {
-	make_shortlog_file(url)
+func getBusFactor() float64 {
+	make_shortlog_file()
 	regex, _ := regexp.Compile("[0-9]+") //Regex for parsing count into only integer
 
-	short_log_raw_data, err1 := os.ReadFile(url + "/shortlog.txt")
+	short_log_raw_data, err1 := os.ReadFile("src/metric_scores/busfactor/shortlog.txt")
 	if err1 != nil {
 		fmt.Println("Did not find shortlog file")
 		log.Fatal(err1)
@@ -163,8 +161,8 @@ func getBusFactor(url string) float64 {
 	len_log := len(arr) - 1
 
 	if len_log < 1 {
-		fmt.Println("No committers for repo " + url)
-		delete_shortlog_file(url)
+		fmt.Println("No committers for repo")
+		delete_shortlog_file()
 		return 0
 	}
 
@@ -179,7 +177,7 @@ func getBusFactor(url string) float64 {
 	total_bus_guys := 0
 	var num string
 
-	fmt.Println(len_log)
+	//fmt.Println(len_log)
 
 	for i := 0; i < len_log; i++ {
 		num = regex.FindString(arr[i])
@@ -193,39 +191,41 @@ func getBusFactor(url string) float64 {
 			total_bus_guys += num_int
 		}
 	}
-	delete_shortlog_file(url)
+	delete_shortlog_file()
 	metric := (float64(total) - float64(total_bus_guys)) / float64(total)
-	fmt.Println(metric)
+	//fmt.Println(metric)
 	return metric
 }
 
-func make_shortlog_file(url string) {
-	os.Chdir(url)
+func make_shortlog_file() {
+	os.Chdir("src/metric_scores/repos")
 
 	cmd := exec.Command("git", "shortlog", "HEAD", "-se", "-n")
-	cwd, _ := os.Getwd()
+	//cwd, _ := os.Getwd()
 
-	fmt.Println("dir is " + cwd)
+	//fmt.Println("dir is " + cwd)
 
 	out, err := cmd.Output()
 
 	if err != nil {
-		fmt.Println("Did not find closed issues file from api, invalid url: " + url)
+		fmt.Println("Did not find closed issues file from api, invalid url: ")
 		// log.Fatal(err)
 	}
-
+	os.Chdir("../")
+	os.Chdir("busfactor")
 	os.WriteFile("shortlog.txt", out, 0644)
-
+	os.Chdir("../")
+	os.Chdir("../")
 	os.Chdir("../")
 
-	cwd, _ = os.Getwd()
-	fmt.Println("dir is " + cwd)
+	//cwd, _ = os.Getwd()
+	//fmt.Println("dir is " + cwd)
 
 }
 
-func delete_shortlog_file(url string) {
+func delete_shortlog_file() {
 	var command string
-	command = "rm -f " + url + "/shortlog.txt"
+	command = "rm -f src/metric_scores/busfactor/shortlog.txt"
 	s := subprocess.New(command, subprocess.Shell)
 	s.Exec()
 
@@ -449,8 +449,9 @@ func printRepo(next *repo) {
 	}
 }
 
+// Prints each repo in NDJSON output format (.2 decimals for floats)
 func repoOUT(r *repo) {
-	fmt.Printf("{\"URL\":\"%s\", \"NET_SCORE\":%.2f, \"RAMP_UP_SCORE\":%.2f, \"CORRECTNESS_SCORE\":%.2f, \"BUS_FACTOR_SCORE\":%.2f, \"RESPONSIVE_MAINTAINER_SCORE\":%.2f, \"LICENSE_SCORE\":%.2f \n", r.URL, r.netScore, r.rampUpTime, r.correctness, r.busFactor, r.responsiveness, r.licenseCompatibility)
+	fmt.Printf("{\"URL\":\"%s\", \"NET_SCORE\":%.2f, \"RAMP_UP_SCORE\":%.2f, \"CORRECTNESS_SCORE\":%.2f, \"BUS_FACTOR_SCORE\":%.2f, \"RESPONSIVE_MAINTAINER_SCORE\":%.2f, \"LICENSE_SCORE\":%.2f} \n", r.URL, r.netScore, r.rampUpTime, r.correctness, r.busFactor, r.responsiveness, r.licenseCompatibility)
 }
 
 // * END OF STDOUT * \\
