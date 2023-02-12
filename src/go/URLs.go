@@ -120,7 +120,7 @@ func removeScores() {
 
 // * START OF RAMP-UP TIME * \\
 
-// Function to get ramp-up time metric scor
+// Function to get ramp-up time metric score, calls rampUpTime.py, reads result from RU_Result.txt, returns that result as float
 func getRampUpTime(url string) float64 {
 	var command string
 	command = "python3 src/python/rampUpTime.py"
