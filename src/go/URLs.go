@@ -38,9 +38,10 @@ type repo struct {
 
 // this is a function to utilize createing a new repo and initializing each metric within
 func newRepo(url string) *repo {
+	InfoLogger.Println("Getting metrics for new repo ", url)
 	cloneRepo(url)
 	r := repo{URL: url}
-	r.busFactor = getBusFactor()
+	r.busFactor = getBusFactor(r.URL)
 	r.correctness = getCorrectness(r.URL)
 	r.licenseCompatibility = getLicenseCompatibility(r.URL)
 	r.rampUpTime = getRampUpTime(r.URL)
@@ -50,23 +51,20 @@ func newRepo(url string) *repo {
 	} else {
 		r.netScore = ((75 * r.licenseCompatibility) + (15 * r.busFactor) + (20 * r.responsiveness) + (20 * r.rampUpTime) + (20 * r.correctness)) / 150
 	}
-	//make_shortlog_file("ECE461ProjectCLI")
-	//r.busFactor = getBusFactor(r.repoName)
-
-	// s := subprocess.New("rmdir --ignore-fail-on-non-empty " + r.repoName, subprocess.Shell)
-	// s.Exec()
 	clearRepoFolder()
+
+	InfoLogger.Println("Done getting metrics for ", url)
 
 	return &r
 }
 
-//r.busFactor = getBusFactor(r.repoName)
 // * END OF REPO STRUCTS * \\
 
 // * START OF RESPONSIVENESS * \\
 
 // Function to get responsiveness metric score
 func getResponsiveness(url string) float64 {
+	InfoLogger.Println("Getting responsiveness for ", url)
 	// Variable declarations
 	var command string
 
@@ -92,19 +90,24 @@ func getResponsiveness(url string) float64 {
 		// if error return 0 as score and remove file, otherwise return score
 		if err != nil {
 			removeScores()
+			DebugLogger.Println("Error pasing score : ", err)
 			return 0
 		} else {
 			removeScores()
+			InfoLogger.Printf("Got responsiveness score: %f for %s\n", score, url)
 			return score
 		}
 	}
 	// in case of error, removeScores, return 0
 	removeScores()
+	DebugLogger.Println("Error getting responsiveness")
 	return 0
 }
 
 // This function removes the responsiveness score text file
 func removeScores() {
+	DebugLogger.Println("Removing scores")
+	
 	// Variable declarations
 	var command string
 
@@ -116,6 +119,7 @@ func removeScores() {
 
 	// executes command
 	r.Exec()
+	DebugLogger.Println("Scores removed")
 }
 
 // * END OF RESPONSIVENESS * \\
@@ -124,21 +128,23 @@ func removeScores() {
 
 // Function to get ramp-up time metric score, calls rampUpTime.py, reads result from RU_Result.txt, returns that result as float
 func getRampUpTime(url string) float64 {
+	InfoLogger.Println("Getting ramp up time for ", url)
 	var command string
 	command = "python3 src/python/rampUpTime.py"
 	r := subprocess.New(command, subprocess.Shell)
 	r.Exec()
 	dat, err := os.ReadFile("src/metric_scores/rampuptime/RU_Result.txt")
 	if err != nil {
-		fmt.Println("File open failed")
+		DebugLogger.Println("File open failed")
 	}
 	command = "rm src/metric_scores/rampuptime/RU_Result.txt"
 	r = subprocess.New(command, subprocess.Shell)
 	r.Exec()
 	f1, err := strconv.ParseFloat(string(dat), 64)
 	if err != nil {
-		fmt.Println("Conversion of string to float didn't work.")
+		DebugLogger.Println("Conversion of string to float didn't work.")
 	}
+	InfoLogger.Printf("Got ramp up time score: %f for %s\n", f1, url)
 	return f1
 
 }
@@ -148,13 +154,15 @@ func getRampUpTime(url string) float64 {
 // * START OF BUS FACTOR * \\
 
 // Function to get bus factor metric score
-func getBusFactor() float64 {
+func getBusFactor(url string) float64 {
+	InfoLogger.Println("Getting bus factor for ", url)
+	
 	make_shortlog_file()
 	regex, _ := regexp.Compile("[0-9]+") //Regex for parsing count into only integer
 
 	short_log_raw_data, err1 := os.ReadFile("src/metric_scores/busfactor/shortlog.txt")
 	if err1 != nil {
-		fmt.Println("Did not find shortlog file")
+		DebugLogger.Println("Did not find shortlog file")
 		log.Fatal(err1)
 	}
 
@@ -163,7 +171,7 @@ func getBusFactor() float64 {
 	len_log := len(arr) - 1
 
 	if len_log < 1 {
-		fmt.Println("No committers for repo")
+		DebugLogger.Println("No committers for repo")
 		delete_shortlog_file()
 		return 0
 	}
@@ -179,13 +187,12 @@ func getBusFactor() float64 {
 	total_bus_guys := 0
 	var num string
 
-	//fmt.Println(len_log)
 
 	for i := 0; i < len_log; i++ {
 		num = regex.FindString(arr[i])
 		num_int, err2 := strconv.Atoi(num)
 		if err2 != nil {
-			fmt.Println("Conversion from string to int didn't work (bus factor calc)")
+			DebugLogger.Println("Conversion from string to int didn't work (bus factor calc)")
 			log.Fatal(err2)
 		}
 		total += num_int
@@ -195,23 +202,21 @@ func getBusFactor() float64 {
 	}
 	delete_shortlog_file()
 	metric := (float64(total) - float64(total_bus_guys)) / float64(total)
-	//fmt.Println(metric)
+
+	InfoLogger.Printf("Got bus factor score: %f for %s\n", metric, url)
 	return metric
 }
 
 func make_shortlog_file() {
+	DebugLogger.Println("Making shortlog file")
 	os.Chdir("src/metric_scores/repos")
 
 	cmd := exec.Command("git", "shortlog", "HEAD", "-se", "-n")
-	//cwd, _ := os.Getwd()
-
-	//fmt.Println("dir is " + cwd)
 
 	out, err := cmd.Output()
 
 	if err != nil {
-		fmt.Println("Did not find closed issues file from api, invalid url: ")
-		// log.Fatal(err)
+		DebugLogger.Println("Did not find closed issues file from api, invalid url: ")
 	}
 	os.Chdir("../")
 	os.Chdir("busfactor")
@@ -220,17 +225,18 @@ func make_shortlog_file() {
 	os.Chdir("../")
 	os.Chdir("../")
 
-	//cwd, _ = os.Getwd()
-	//fmt.Println("dir is " + cwd)
+	DebugLogger.Println("Done making shortlog file")
 
 }
 
 func delete_shortlog_file() {
+	DebugLogger.Println("Deleting shortlog file")
 	var command string
 	command = "rm -f src/metric_scores/busfactor/shortlog.txt"
 	s := subprocess.New(command, subprocess.Shell)
 	s.Exec()
 
+	DebugLogger.Println("Done deleting shortlog file")
 }
 
 // * END OF BUS FACTOR * \\
@@ -239,6 +245,7 @@ func delete_shortlog_file() {
 
 // Function to get correctness metric score
 func getCorrectness(url string) float64 {
+	InfoLogger.Println("Getting correctness for ", url)
 
 	// runs RestAPI on url
 	runRestApi(url)
@@ -269,12 +276,14 @@ func getCorrectness(url string) float64 {
 	// removes files API output files
 	teardownRestApi()
 
+	InfoLogger.Printf("Got correctness: %f for %s\n", score, url)
 	// returns score
 	return score
 }
 
 // Runs rest api
 func runRestApi(url string) int {
+	DebugLogger.Println("Running rest API on ", url)
 
 	index := strings.Index(url, ".com/")
 	if index == -1 {
@@ -285,9 +294,10 @@ func runRestApi(url string) int {
 
 	// gets env github token
 	token := os.Getenv("GITHUB_TOKEN")
+	DebugLogger.Println("Got GIHUB_TOKEN ", token)
 
 	// command to check if files are in directory, removes them, then runs restapi
-	command := "python3 -c 'import os; os.remove(\"src/metric_scores/correctness/closed.txt\") if os.path.exists(\"src/metric_scores/correctness/closed.txt\") else \"continue\"; os.remove(\"src/metric_scores/correctness/open.txt\") if os.path.exists(\"src/metric_scores/correctness/open.txt\") else \"continue\"; os.system(\"curl -i -H \\\"Authorization: token " + token + "\\\" https://api.github.com/search/issues?q=repo:" + url + "+type:issue+state:closed >> src/metric_scores/correctness/closed.txt\"); os.system(\"curl -i -H \\\"Authorization: token " + token + "\\\" https://api.github.com/search/issues?q=repo:" + url + "+type:issue+state:open >> src/metric_scores/correctness/open.txt\");'"
+	command := "python3 -c 'import os; os.remove(\"src/metric_scores/correctness/closed.txt\") if os.path.exists(\"src/metric_scores/correctness/closed.txt\") else \"continue\"; os.remove(\"src/metric_scores/correctness/open.txt\") if os.path.exists(\"src/metric_scores/correctness/open.txt\") else \"continue\"; os.system(\"curl -s -i -H \\\"Authorization: token " + token + "\\\" https://api.github.com/search/issues?q=repo:" + url + "+type:issue+state:closed >> src/metric_scores/correctness/closed.txt\"); os.system(\"curl -s -i -H \\\"Authorization: token " + token + "\\\" https://api.github.com/search/issues?q=repo:" + url + "+type:issue+state:open >> src/metric_scores/correctness/open.txt\");'"
 
 	// creates subprocess to run on shell
 	r := subprocess.New(command, subprocess.Shell)
@@ -295,10 +305,12 @@ func runRestApi(url string) int {
 	//Executes subprocess
 	r.Exec()
 
+	DebugLogger.Println("Done running rest API on ", url)
 	return 0
 }
 
 func teardownRestApi() {
+	DebugLogger.Println("Tearing down rest API")
 	// Variable declarations
 	var command string
 
@@ -310,24 +322,29 @@ func teardownRestApi() {
 
 	// executes command
 	r.Exec()
-
+	
+	DebugLogger.Println("Done tearing down rest API")
 }
 
 // calculates score for correctness
 func calc_score(s1 string, s2 string) float64 {
+	DebugLogger.Println("Converting string to float")
+
 	// converts string to float
 	f1, err := strconv.ParseFloat(s1, 32)
 	if err != nil {
-		fmt.Println("Conversion of s1 to string float didn't work.")
+		DebugLogger.Println("Conversion of s1 to string float didn't work.")
 	}
 	//converts string to float
 	f2, err1 := strconv.ParseFloat(s2, 32)
 	if err1 != nil {
-		fmt.Println("Conversion of s2 to string float didn't work.")
+		DebugLogger.Println("Conversion of s2 to string float didn't work.")
 	}
 
 	// round(20 * closed issues / (open + closed issues)) / 20 = correctness score [0,1]
 	f3 := f2 / (f1 + f2)
+
+	DebugLogger.Println("Done onverting string to float")
 	return f3
 }
 
@@ -337,22 +354,20 @@ func calc_score(s1 string, s2 string) float64 {
 
 // Function to get license compatibility metric score
 func getLicenseCompatibility(url string) float64 {
+	InfoLogger.Println("Getting license compatibility for ", url)
 
 	// checks to see if license is found
 	foundLicense := searchForLicenses("./src/metric_scores/repos/")
+	
 
+	InfoLogger.Printf("Got license compatibility: %f for %s\n", foundLicense, url)
 	// returns score based on if license is found
-	if foundLicense {
-		//fmt.Println("[LICENSE FOUND]")
-		return 1
-	} else {
-		//fmt.Println("[LICENSE NOT FOUND]")
-		return 0
-	}
+	return foundLicense
 }
 
 // searches directories for license
-func searchForLicenses(folder string) bool {
+func searchForLicenses(folder string) float64 {
+	DebugLogger.Println("Searching for licences in ", folder)
 	// initialize found as false
 	found := false
 
@@ -377,20 +392,28 @@ func searchForLicenses(folder string) bool {
 
 	//catch errors
 	if err != nil {
-		return false
+		DebugLogger.Println("Error searching for licenses: ", err)
+		return 0.00
 	}
-	return found
+
+	if found {
+		DebugLogger.Println("Done searching for licence: found")
+		return 1.00
+	}
+	DebugLogger.Println("Done searching for licence: not found")
+	return 0.00
 }
 
 // searches file for license
 func checkFileForLicense(path string) bool {
+	DebugLogger.Println("Checking file for license: ", path)
 	// license to search for
 	license := "LGPL-2.1"
 
 	// searches for license string
 	file, err := os.Open(path)
 	if err != nil {
-		//fmt.Println(err)
+		DebugLogger.Println("Error opening file: ", err)
 		return false
 	}
 	defer file.Close()
@@ -399,10 +422,11 @@ func checkFileForLicense(path string) bool {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if idx := strings.Index(line, license); idx != -1 {
-			//fmt.Println("Found license in file:", path)
+			DebugLogger.Println("Found license in file:", path)
 			return true
 		}
 	}
+	DebugLogger.Println("No license found in file: ", path)
 	return false
 }
 
@@ -411,28 +435,31 @@ func checkFileForLicense(path string) bool {
 // * START OF REPO CLONING/REMOVING  * \\
 
 func cloneRepo(url string) string {
-	//fmt.Println("Cloning Repo")
+	DebugLogger.Println("Cloning repo: ", url)
 	s := subprocess.New("git clone --quiet "+url+" src/metric_scores/repos", subprocess.Shell)
 	if err := s.Exec(); err != nil {
 		log.Fatal(err)
-		fmt.Println(err)
+		DebugLogger.Printf("Error cloning repo %s: %s\n", url, err)
 		return ("ERROR CLONING")
 	}
 	index := strings.Index(url, ".com/")
 	if index == -1 {
-		//fmt.Println("No '.com/' found in the string")
+		DebugLogger.Println("No '.com/' found in the string ", url)
 		return "FAILURE"
 	}
 
-	url = url[index+5:]
 	r, _ := regexp.Compile("/")
-	a := r.Split(url, 2)
+	a := r.Split(url[index+5:], 2)
+
+	DebugLogger.Println("Cloned repo: ", a[1])
 	return a[1]
 }
 
 func clearRepoFolder() {
+	DebugLogger.Println("Clearing repo folder")
 	s := subprocess.New("rm -rf ", subprocess.Arg("src/metric_scores/repos"), subprocess.Shell)
 	s.Exec()
+	DebugLogger.Println("Done clearing repo folder")
 }
 
 // * END OF REPO CLONING/REMOVING  * \\
@@ -453,6 +480,8 @@ func printRepo(next *repo) {
 
 // Prints each repo in NDJSON output format (.2 decimals for floats)
 func repoOUT(r *repo) {
+	InfoLogger.Println("Final repo result:")
+	InfoLogger.Printf("{\"URL\":\"%s\", \"NET_SCORE\":%.2f, \"RAMP_UP_SCORE\":%.2f, \"CORRECTNESS_SCORE\":%.2f, \"BUS_FACTOR_SCORE\":%.2f, \"RESPONSIVE_MAINTAINER_SCORE\":%.2f, \"LICENSE_SCORE\":%.2f} \n", r.URL, r.netScore, r.rampUpTime, r.correctness, r.busFactor, r.responsiveness, r.licenseCompatibility)
 	fmt.Printf("{\"URL\":\"%s\", \"NET_SCORE\":%.2f, \"RAMP_UP_SCORE\":%.2f, \"CORRECTNESS_SCORE\":%.2f, \"BUS_FACTOR_SCORE\":%.2f, \"RESPONSIVE_MAINTAINER_SCORE\":%.2f, \"LICENSE_SCORE\":%.2f} \n", r.URL, r.netScore, r.rampUpTime, r.correctness, r.busFactor, r.responsiveness, r.licenseCompatibility)
 }
 
@@ -461,6 +490,7 @@ func repoOUT(r *repo) {
 // * START OF SORTING * \\
 
 func addRepo(head *repo, curr *repo, temp *repo) *repo {
+	DebugLogger.Println("Adding repo to list")
 	head.next = curr
 	if curr == nil {
 		head.next = temp
@@ -473,6 +503,7 @@ func addRepo(head *repo, curr *repo, temp *repo) *repo {
 		}
 	}
 
+	DebugLogger.Println("Done adding repo to list")
 	return head
 }
 
