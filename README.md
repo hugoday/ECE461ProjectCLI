@@ -12,7 +12,7 @@ We parse those URLs and perform metric calculations to score the repositories.
 Metrics include: Correctness, Bus Factor, Responsiveness, Ramp-Up Time, and License Compatibility.
 
 Requirements:
-Ramp-Up Time is dependent on cloc - https://github.com/AlDanial/cloc \n
+Ramp-Up Time is dependent on cloc - https://github.com/AlDanial/cloc
 We are required to accept NPMJS Package URLs and Github Repository URLs - Currently only accept Github URLs.
 We are required to take the URL and output a net score based on the five calculated metrics.
 We are required to use at least 30% of a specific language from a list of languages - we chose Go.
