@@ -14,11 +14,11 @@ def main(argv):
     arg = sys.argv[1]
     if arg == "install":
         #install dependencies
-        print("installing")
+        print("no installation needed")
         return 0
     elif arg == "build":
         #complete any compilation
-        print("building")
+        print("no building needed")
         return 0
     elif arg == "test":
         #run tests
