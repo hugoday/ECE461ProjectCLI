@@ -1,0 +1,5 @@
+{"metric":"RAMP_UP_SCORE", "api":"clone", "filepath":"src/go/URLs.go", "line":130}
+{"metric":"RESPONSIVE_MAINTAINER_SCORE", "api":"grapqhl", "filepath":"src/go/URLs.go", "line":66}
+{"metric":"CORRECTNESS_SCORE", "api":"rest", "filepath":"src/go/URLs.go", "line":247}
+{"metric":"LICENSE_SCORE", "api":"clone", "filepath":"src/go/URLs.go"", "line":356}
+{"metric":"BUS_FACTOR_SCORE", "api":"clone", "filepath":"src/go/URLs.go", "line":157}
