@@ -6,29 +6,33 @@ import (
 	"log"
 	// "math"
 	// "utils"
+	"fmt"
 	"os"
 )
 
 var (
-    DebugLogger   *log.Logger
-    InfoLogger    *log.Logger
+	DebugLogger *log.Logger
+	InfoLogger  *log.Logger
 )
 
 type NoLog int
+
 func (NoLog) Write([]byte) (int, error) {
 	return 0, nil
 }
 
-
 func main() {
+
+	fmt.Println("Aditya Srikanth")
+
 	doLogging := true
 	logFileName := os.Getenv("LOG_FILE")
 	logLevel := os.Getenv("LOG_LEVEL")
 	logFile, err := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-    if err != nil || (logLevel != "1" && logLevel != "2") {
-        doLogging = false
-    }
-	
+	if err != nil || (logLevel != "1" && logLevel != "2") {
+		doLogging = false
+	}
+
 	if doLogging {
 		if logLevel == "2" {
 			DebugLogger = log.New(logFile, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
